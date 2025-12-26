@@ -3,19 +3,45 @@ import React from 'react';
 import type { Statistics, LayoutStats } from '../hooks/useStatistics';
 import { LAYOUTS } from '../game/layouts';
 
+// SVG Icons
+const StatsIcon = () => (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+);
+
+const TrophyIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+        <path d="M4 22h16" />
+        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+    </svg>
+);
+
+const TrashIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 6h18" />
+        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    </svg>
+);
+
+const CloseIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12" />
+    </svg>
+);
+
 interface StatsModalProps {
     statistics: Statistics;
     onClose: () => void;
     onReset: () => void;
 }
-
-const LAYOUT_ICONS: Record<string, string> = {
-    turtle: '🐢',
-    pyramid: '🔺',
-    dragon: '🐉',
-    fortress: '🏰',
-    bridge: '🌉',
-};
 
 export const StatsModal: React.FC<StatsModalProps> = ({
     statistics,
@@ -40,10 +66,12 @@ export const StatsModal: React.FC<StatsModalProps> = ({
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content max-w-md" onClick={e => e.stopPropagation()}>
+            <div className="modal-content max-w-md max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                 {/* Header */}
                 <div className="text-center mb-6">
-                    <span className="text-4xl mb-2 block">📊</span>
+                    <span className="text-[var(--color-accent-gold)] mb-2 block flex justify-center">
+                        <StatsIcon />
+                    </span>
                     <h2 className="text-2xl font-bold" style={{
                         background: 'linear-gradient(135deg, var(--color-accent-gold) 0%, #ffeb3b 100%)',
                         WebkitBackgroundClip: 'text',
@@ -105,16 +133,13 @@ export const StatsModal: React.FC<StatsModalProps> = ({
                                 }}
                             >
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-lg">{LAYOUT_ICONS[layout.id] || '🎯'}</span>
-                                        <span className="font-medium">{layout.name}</span>
-                                    </div>
-                                    <div className="flex gap-3 text-sm">
+                                    <span className="font-medium">{layout.name}</span>
+                                    <div className="flex gap-3 text-sm items-center">
                                         <span className="text-[var(--color-text-secondary)]">
                                             {stats.gamesWon}/{stats.gamesPlayed}
                                         </span>
-                                        <span className="text-[var(--color-accent-gold)] font-mono">
-                                            🏆 {formatTime(stats.bestTime)}
+                                        <span className="text-[var(--color-accent-gold)] font-mono flex items-center gap-1">
+                                            <TrophyIcon /> {formatTime(stats.bestTime)}
                                         </span>
                                     </div>
                                 </div>
@@ -139,16 +164,16 @@ export const StatsModal: React.FC<StatsModalProps> = ({
                 {/* Action buttons */}
                 <div className="flex gap-3">
                     <button
-                        className="game-button flex-1 text-[var(--color-accent-red)]"
+                        className="game-button flex-1 text-[var(--color-accent-red)] flex items-center justify-center gap-2"
                         onClick={onReset}
                     >
-                        🗑️ Reset
+                        <TrashIcon /> Reset
                     </button>
                     <button
-                        className="game-button game-button-primary flex-1"
+                        className="game-button game-button-primary flex-1 flex items-center justify-center gap-2"
                         onClick={onClose}
                     >
-                        ✓ Close
+                        <CloseIcon /> Close
                     </button>
                 </div>
             </div>

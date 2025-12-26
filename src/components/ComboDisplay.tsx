@@ -42,10 +42,10 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
     };
 
     const getComboText = () => {
-        if (combo >= 5) return '🔥 ON FIRE!';
-        if (combo >= 4) return '⚡ AMAZING!';
-        if (combo >= 3) return '💫 GREAT!';
-        if (combo >= 2) return '✨ NICE!';
+        if (combo >= 5) return 'ON FIRE!';
+        if (combo >= 4) return 'AMAZING!';
+        if (combo >= 3) return 'GREAT!';
+        if (combo >= 2) return 'NICE!';
         return '';
     };
 

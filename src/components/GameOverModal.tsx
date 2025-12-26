@@ -1,6 +1,34 @@
 // Game over modal for stuck state - premium styling
 import React from 'react';
 
+// SVG Icons
+const AlertIcon = () => (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+);
+
+const ShuffleIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 3h5v5" />
+        <path d="M4 20L21 3" />
+        <path d="M21 16v5h-5" />
+        <path d="M15 15l6 6" />
+        <path d="M4 4l5 5" />
+    </svg>
+);
+
+const NewGameIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+    </svg>
+);
+
 interface GameOverModalProps {
     onShuffle: () => void;
     onNewGame: () => void;
@@ -14,8 +42,8 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
         <div className="modal-overlay">
             <div className="modal-content text-center">
                 {/* Animated warning icon */}
-                <div className="text-6xl mb-4" style={{ animation: 'winBounce 0.5s ease-out' }}>
-                    😔
+                <div className="text-[var(--color-accent-red)] mb-4 flex justify-center" style={{ animation: 'winBounce 0.5s ease-out' }}>
+                    <AlertIcon />
                 </div>
 
                 <h2 className="text-2xl font-bold mb-2" style={{
@@ -37,16 +65,16 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
 
                 <div className="flex gap-3">
                     <button
-                        className="game-button flex-1 py-4 text-lg"
+                        className="game-button flex-1 py-4 text-lg flex items-center justify-center gap-2"
                         onClick={onShuffle}
                     >
-                        🔀 Shuffle
+                        <ShuffleIcon /> Shuffle
                     </button>
                     <button
-                        className="game-button game-button-primary flex-1 py-4 text-lg"
+                        className="game-button game-button-primary flex-1 py-4 text-lg flex items-center justify-center gap-2"
                         onClick={onNewGame}
                     >
-                        🎮 New Game
+                        <NewGameIcon /> New Game
                     </button>
                 </div>
             </div>
@@ -55,3 +83,4 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
 };
 
 export default GameOverModal;
+

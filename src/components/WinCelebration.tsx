@@ -41,6 +41,25 @@ const FIREWORK_COLORS = [
     '#7c4dff', '#00e676', '#00bcd4', '#448aff'
 ];
 
+// SVG Icons
+const StarIcon = ({ filled }: { filled: boolean }) => (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+);
+
+const PlayIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3" />
+    </svg>
+);
+
+const RefreshIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+    </svg>
+);
+
 export const WinCelebration: React.FC<WinCelebrationProps> = ({
     elapsedTime,
     matchesMade,
@@ -192,21 +211,21 @@ export const WinCelebration: React.FC<WinCelebrationProps> = ({
             {showContent && (
                 <div className="relative text-center p-8 z-10" style={{ animation: 'modalSlideIn 0.5s ease-out' }}>
                     <h1 className="win-title">
-                        🎊 You Win! 🎊
+                        Victory!
                     </h1>
 
                     {/* Star rating */}
-                    <div className="flex justify-center gap-2 mb-4">
+                    <div className="flex justify-center gap-3 mb-4 text-[var(--color-accent-gold)]">
                         {[1, 2, 3].map(star => (
                             <span
                                 key={star}
-                                className={`text-4xl transition-all duration-500 ${star <= rating.stars ? 'opacity-100 scale-100' : 'opacity-30 scale-75'}`}
+                                className={`transition-all duration-500 ${star <= rating.stars ? 'opacity-100 scale-100' : 'opacity-30 scale-75'}`}
                                 style={{
                                     animation: star <= rating.stars ? 'winBounce 0.5s ease-out backwards' : 'none',
                                     animationDelay: `${0.3 + star * 0.15}s`
                                 }}
                             >
-                                ⭐
+                                <StarIcon filled={star <= rating.stars} />
                             </span>
                         ))}
                     </div>
@@ -231,16 +250,16 @@ export const WinCelebration: React.FC<WinCelebrationProps> = ({
 
                     <div className="flex gap-4 justify-center flex-wrap">
                         <button
-                            className="game-button game-button-primary text-lg px-8 py-4"
+                            className="game-button game-button-primary text-lg px-8 py-4 flex items-center gap-2"
                             onClick={onPlayAgain}
                         >
-                            🎮 Play Again
+                            <PlayIcon /> Play Again
                         </button>
                         <button
-                            className="game-button text-lg px-8 py-4"
+                            className="game-button text-lg px-8 py-4 flex items-center gap-2"
                             onClick={onChangeLayout}
                         >
-                            🔄 Change Layout
+                            <RefreshIcon /> Change Layout
                         </button>
                     </div>
                 </div>
@@ -250,3 +269,4 @@ export const WinCelebration: React.FC<WinCelebrationProps> = ({
 };
 
 export default WinCelebration;
+
