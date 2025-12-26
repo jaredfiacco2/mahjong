@@ -88,21 +88,23 @@ export const Board: React.FC<BoardProps> = ({
         setScale(finalScale);
     }, [baseWidth, baseHeight, userZoom]);
 
-    // Update scale on mount and resize
+    // Use ResizeObserver for smooth scaling
     useEffect(() => {
-        updateScale();
+        if (!containerRef.current) return;
 
-        const handleResize = () => {
+        const observer = new ResizeObserver(() => {
             updateScale();
-        };
+        });
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        observer.observe(containerRef.current);
+        updateScale(); // Initial call
+
+        return () => observer.disconnect();
     }, [updateScale]);
 
+    // Also update when tiles change (layout change)
     useEffect(() => {
-        const timeout = setTimeout(updateScale, 100); // Small delay to let container settle
-        return () => clearTimeout(timeout);
+        updateScale();
     }, [tiles, updateScale]);
 
     const hintSet = useMemo(() => {

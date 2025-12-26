@@ -74,18 +74,33 @@ export function isFreeTile(tile: TileInstance, allTiles: TileInstance[]): boolea
 }
 
 /**
- * Find all valid matching pairs on the board
+ * Find all valid matching pairs on the board.
+ * Optimized to O(N^2) by pre-calculating free status.
  */
 export function findAllMatches(tiles: TileInstance[]): [TileInstance, TileInstance][] {
-    const freeTiles = tiles.filter(t => !t.isRemoved && isFreeTile(t, tiles));
+    const activeTiles = tiles.filter(t => !t.isRemoved);
+    // Pre-calculate which tiles are free to avoid cubic complexity
+    const freeTiles = activeTiles.filter(t => isFreeTile(t, activeTiles));
+    
     const matches: [TileInstance, TileInstance][] = [];
+    const typeMap = new Map<string, TileType | undefined>();
 
     for (let i = 0; i < freeTiles.length; i++) {
         for (let j = i + 1; j < freeTiles.length; j++) {
             const tile1 = freeTiles[i];
             const tile2 = freeTiles[j];
-            const type1 = getTileTypeById(tile1.typeId);
-            const type2 = getTileTypeById(tile2.typeId);
+            
+            let type1 = typeMap.get(tile1.typeId);
+            if (!type1) {
+                type1 = getTileTypeById(tile1.typeId);
+                typeMap.set(tile1.typeId, type1);
+            }
+            
+            let type2 = typeMap.get(tile2.typeId);
+            if (!type2) {
+                type2 = getTileTypeById(tile2.typeId);
+                typeMap.set(tile2.typeId, type2);
+            }
 
             if (type1 && type2 && tilesMatch(type1, type2)) {
                 matches.push([tile1, tile2]);

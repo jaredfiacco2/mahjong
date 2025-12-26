@@ -3,79 +3,61 @@
 
 /* Custom Mahjong Tile Styles - Premium Edition */
 @theme {
-  /* Apple-inspired premium dark theme */
-  --color-bg-primary: #000000;
-  --color-bg-secondary: #0a0a0c;
-  --color-bg-tertiary: #161618;
-  --color-bg-card: rgba(28, 28, 30, 0.7);
+  /* Luxury Boutique Material Palette */
+  --color-ebony: #121214;
+  --color-slate: #1c1c1e;
+  --color-ivory: #ffffff;
+  --color-ivory-shadow: #e5e5ea;
+  --color-porcelain: #f2f2f7;
 
-  /* Tile colors - Sophisticated Ivory */
-  --color-tile-face: #ffffff;
-  --color-tile-shadow: #d1d1d6;
-  --color-tile-border: rgba(0, 0, 0, 0.1);
-  --color-tile-selected: #007aff;
-  --color-tile-hint: #34c759;
+  /* Imperial Accents */
+  --color-imperial-gold: #c5a059;
+  --color-royal-gold: #d4af37;
+  --color-jade-deep: #006400;
+  --color-jade-bright: #248a3d;
+  --color-imperial-red: #8b0000;
 
-  /* Text colors - Apple SF Pro feel */
+  /* App Surface Colors */
+  --color-bg-primary: var(--color-ebony);
+  --color-bg-secondary: #1a1a1c;
+  --color-bg-card: rgba(28, 28, 30, 0.9);
+
+  /* Typography */
   --color-text-primary: #ffffff;
-  --color-text-secondary: #8e8e93;
-  --color-text-muted: #48484a;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #52525b;
 
-  /* Premium accents */
-  --color-accent-gold: #ff9f0a;
-  --color-accent-red: #ff3b30;
-  --color-accent-emerald: #34c759;
-  --color-accent-cyan: #30d5c8;
-  --color-accent-purple: #bf5af2;
+  /* UI Tokens */
   --color-accent-blue: #007aff;
-
-  /* Asian-inspired accent refined */
-  --color-jade: #248a3d;
-  --color-crimson: #af1923;
-  --color-gold: #d4af37;
+  --color-accent-gold: var(--color-imperial-gold);
 
   /* Fonts */
-  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: 'Inter', -apple-system, system-ui, sans-serif;
+  --font-body: 'Inter', -apple-system, system-ui, sans-serif;
 }
 
-/* Base styles with animated gradient background */
+/* Luxury Surface with subtle texture */
 body {
-  @apply text-[var(--color-text-primary)] font-[var(--font-body)] antialiased;
-  background:
-    radial-gradient(ellipse at 20% 0%, rgba(0, 188, 212, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(187, 134, 252, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(0, 200, 83, 0.05) 0%, transparent 60%),
-    linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
-  min-height: 100vh;
-  overflow-x: hidden;
+  margin: 0;
+  font-family: var(--font-body);
+  background: radial-gradient(circle at center, #1c1c1e 0%, #0a0a0c 100%);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
   touch-action: auto;
-  -webkit-tap-highlight-color: transparent;
 }
 
-/* Animated background pattern */
-body::before {
-  content: '';
+/* Luxurious noise texture overlay */
+body::after {
+  content: "";
   position: fixed;
   inset: 0;
-  background-image:
-    radial-gradient(circle at 25% 25%, rgba(255, 193, 7, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(0, 230, 118, 0.03) 0%, transparent 50%);
-  animation: backgroundPulse 15s ease-in-out infinite;
+  opacity: 0.02;
   pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes backgroundPulse {
-
-  0%,
-  100% {
-    opacity: 0.8;
-  }
-
-  50% {
-    opacity: 1;
-  }
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  z-index: 1000;
 }
 
 /* 3D Tile styling - Flawless */
@@ -91,36 +73,44 @@ body::before {
 .tile-face {
   @apply rounded-lg flex items-center justify-center text-3xl font-bold;
   background: #ffffff;
-  border: 0.5px solid var(--color-tile-border);
+  border: 0.5px solid rgba(0, 0, 0, 0.05);
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    2px 2px 0 #edeef0,
-    3px 3px 0 #d1d1d6,
-    0 10px 20px rgba(0, 0, 0, 0.15);
+    0 1px 1px rgba(0, 0, 0, 0.1),
+    1px 1px 0 #edeef0,
+    2px 2px 0 #e5e5ea,
+    3px 3.5px 0 #d1d1d6,
+    0 15px 30px rgba(0, 0, 0, 0.2);
   transform: translateZ(0);
-  transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+  transition: all 0.3s cubic-bezier(0.2, 1, 0.3, 1);
   position: relative;
   overflow: visible;
 }
 
-/* Internal depth for tile face */
+/* Hand-crafted engraving feel */
+.tile-face svg,
+.tile-face span {
+  filter: drop-shadow(0 0.5px 0.5px rgba(0, 0, 0, 0.1));
+}
+
+/* Internal refined bevel */
 .tile-face::after {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: 1.5px;
   border-radius: 6px;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 1), inset 0 -1px 1px rgba(0, 0, 0, 0.05);
   pointer-events: none;
 }
 
-/* Enhanced hover effect - Minimalist & Smooth */
+/* Enhanced hover effect - Boutique Perfection */
 .mahjong-tile:hover:not(.tile-blocked) .tile-face {
-  transform: translateY(-2px) scale(1.04);
+  transform: translateY(-3px) scale(1.05) rotateX(2deg);
   box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.1),
-    2px 2px 0 #edeef0,
-    3px 3px 0 #d1d1d6,
-    0 20px 40px rgba(0, 0, 0, 0.2);
+    0 4px 10px rgba(0, 0, 0, 0.1),
+    1px 1px 0 #edeef0,
+    2.5px 2.5px 0 #e5e5ea,
+    4px 5px 0 #d1d1d6,
+    0 25px 50px rgba(0, 0, 0, 0.25);
 }
 
 /* Layered tile depth effect - Enhanced */
@@ -385,33 +375,43 @@ body::before {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.stat-group {
+/* Luxury HUD Panel - Material & Inset */
+.glass-hud {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  min-width: 60px;
+  gap: 2rem;
+  padding: 0.85rem 2.5rem;
+  background: #1c1c1e;
+  border-radius: 24px;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  /* Subtle Gold border */
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--color-imperial-gold);
+}
+
+.stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+  margin-top: 1px;
 }
 
 .divider-v {
   width: 0.5px;
   height: 20px;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.pt-safe {
-  padding-top: env(safe-area-inset-top);
-}
-
-/* Progress bar */
-.progress-bar {
-  @apply w-full h-2 rounded-full overflow-hidden;
   background: rgba(255, 255, 255, 0.1);
-}
-
-.progress-fill {
-  @apply h-full rounded-full transition-all duration-300;
-  background: linear-gradient(90deg, var(--color-accent-emerald) 0%, var(--color-accent-cyan) 100%);
-  box-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
 }
 
 /* Modal animations */
