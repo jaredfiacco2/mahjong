@@ -266,6 +266,305 @@ function generateBridgePositions(): LayoutPosition[] {
     return positions.slice(0, 144);
 }
 
+// Spiral layout - tiles arranged in a spiral pattern
+const spiralLayout: Layout = {
+    id: 'spiral',
+    name: 'Spiral',
+    description: 'A mesmerizing spiral pattern',
+    positions: generateSpiralPositions(),
+};
+
+function generateSpiralPositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+    
+    // Create spiral on layer 0
+    const centerX = 8;
+    const centerY = 4;
+    let angle = 0;
+    let radius = 0.5;
+    
+    for (let i = 0; i < 100; i++) {
+        const x = Math.round(centerX + Math.cos(angle) * radius);
+        const y = Math.round(centerY + Math.sin(angle) * radius * 0.6);
+        
+        if (x >= 0 && x < 18 && y >= 0 && y < 9) {
+            const exists = positions.some(p => p.x === x && p.y === y && p.z === 0);
+            if (!exists) {
+                positions.push({ x, y, z: 0 });
+            }
+        }
+        
+        angle += 0.4;
+        radius += 0.15;
+    }
+    
+    // Layer 1 - inner spiral
+    for (let i = 0; i < 30; i++) {
+        const x = Math.round(centerX + Math.cos(i * 0.5) * (2 + i * 0.08));
+        const y = Math.round(centerY + Math.sin(i * 0.5) * (1.2 + i * 0.05));
+        
+        if (x >= 2 && x < 14 && y >= 1 && y < 7) {
+            const exists = positions.some(p => p.x === x && p.y === y && p.z === 1);
+            if (!exists) {
+                positions.push({ x, y, z: 1 });
+            }
+        }
+    }
+    
+    // Layer 2 - center cluster
+    for (let y = 3; y < 6; y++) {
+        for (let x = 6; x < 10; x++) {
+            positions.push({ x, y, z: 2 });
+        }
+    }
+    
+    // Top center
+    positions.push({ x: 7, y: 4, z: 3 });
+    positions.push({ x: 8, y: 4, z: 3 });
+    
+    return positions.slice(0, 144);
+}
+
+// Staircase layout - ascending steps
+const staircaseLayout: Layout = {
+    id: 'staircase',
+    name: 'Staircase',
+    description: 'Ascending steps pattern',
+    positions: generateStaircasePositions(),
+};
+
+function generateStaircasePositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+    
+    // Create stair steps
+    for (let step = 0; step < 8; step++) {
+        const width = 16 - step * 2;
+        const startX = step;
+        const y = step;
+        
+        for (let x = 0; x < width; x++) {
+            positions.push({ x: startX + x, y, z: 0 });
+        }
+    }
+    
+    // Layer 1 - alternating rows
+    for (let step = 1; step < 7; step += 2) {
+        const width = 12 - step * 1.5;
+        const startX = step + 1;
+        const y = step;
+        
+        for (let x = 0; x < Math.floor(width); x++) {
+            positions.push({ x: startX + x, y, z: 1 });
+        }
+    }
+    
+    // Layer 2 - center steps
+    for (let step = 2; step < 6; step++) {
+        const width = 8 - step;
+        const startX = step + 2;
+        const y = step;
+        
+        for (let x = 0; x < Math.max(2, width); x++) {
+            positions.push({ x: startX + x, y, z: 2 });
+        }
+    }
+    
+    return positions.slice(0, 144);
+}
+
+// Diamond layout - tiles in a diamond shape
+const diamondLayout: Layout = {
+    id: 'diamond',
+    name: 'Diamond',
+    description: 'A sparkling diamond shape',
+    positions: generateDiamondPositions(),
+};
+
+function generateDiamondPositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+    const centerX = 8;
+    const centerY = 4;
+    
+    // Layer 0 - large diamond
+    for (let y = 0; y < 9; y++) {
+        const distY = Math.abs(y - centerY);
+        const width = Math.max(1, 9 - distY * 2);
+        const startX = centerX - Math.floor(width / 2);
+        
+        for (let x = 0; x < width; x++) {
+            positions.push({ x: startX + x, y, z: 0 });
+        }
+    }
+    
+    // Layer 1 - medium diamond
+    for (let y = 1; y < 8; y++) {
+        const distY = Math.abs(y - centerY);
+        const width = Math.max(1, 7 - distY * 2);
+        const startX = centerX - Math.floor(width / 2);
+        
+        for (let x = 0; x < width; x++) {
+            positions.push({ x: startX + x, y, z: 1 });
+        }
+    }
+    
+    // Layer 2 - small diamond
+    for (let y = 2; y < 7; y++) {
+        const distY = Math.abs(y - centerY);
+        const width = Math.max(1, 5 - distY * 2);
+        const startX = centerX - Math.floor(width / 2);
+        
+        for (let x = 0; x < width; x++) {
+            positions.push({ x: startX + x, y, z: 2 });
+        }
+    }
+    
+    // Layer 3 - tiny diamond
+    positions.push({ x: centerX, y: 3, z: 3 });
+    positions.push({ x: centerX - 1, y: 4, z: 3 });
+    positions.push({ x: centerX, y: 4, z: 3 });
+    positions.push({ x: centerX + 1, y: 4, z: 3 });
+    positions.push({ x: centerX, y: 5, z: 3 });
+    
+    // Top
+    positions.push({ x: centerX, y: 4, z: 4 });
+    
+    return positions.slice(0, 144);
+}
+
+// Temple layout - pagoda-like structure
+const templeLayout: Layout = {
+    id: 'temple',
+    name: 'Temple',
+    description: 'An ancient temple structure',
+    positions: generateTemplePositions(),
+};
+
+function generateTemplePositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+    
+    // Base - wide foundation
+    for (let y = 0; y < 2; y++) {
+        for (let x = 0; x < 16; x++) {
+            positions.push({ x, y, z: 0 });
+        }
+    }
+    
+    // Middle section
+    for (let y = 2; y < 5; y++) {
+        for (let x = 2; x < 14; x++) {
+            positions.push({ x, y, z: 0 });
+        }
+    }
+    
+    // Top section
+    for (let y = 5; y < 7; y++) {
+        for (let x = 4; x < 12; x++) {
+            positions.push({ x, y, z: 0 });
+        }
+    }
+    
+    // Roof edge
+    for (let x = 5; x < 11; x++) {
+        positions.push({ x, y: 7, z: 0 });
+    }
+    
+    // Layer 1 - inner structure
+    for (let y = 2; y < 5; y++) {
+        for (let x = 4; x < 12; x++) {
+            positions.push({ x, y, z: 1 });
+        }
+    }
+    
+    // Layer 2 - upper floor
+    for (let y = 3; y < 5; y++) {
+        for (let x = 5; x < 11; x++) {
+            positions.push({ x, y, z: 2 });
+        }
+    }
+    
+    // Layer 3 - roof
+    for (let x = 6; x < 10; x++) {
+        positions.push({ x, y: 3.5, z: 3 });
+    }
+    
+    // Spire
+    positions.push({ x: 7.5, y: 3.5, z: 4 });
+    
+    return positions.slice(0, 144);
+}
+
+// Scatter layout - randomly distributed with some clustering
+const scatterLayout: Layout = {
+    id: 'scatter',
+    name: 'Scatter',
+    description: 'A unique scattered pattern',
+    positions: generateScatterPositions(),
+};
+
+function generateScatterPositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+    
+    // Create clusters
+    const clusters = [
+        { cx: 3, cy: 2, size: 4 },
+        { cx: 12, cy: 2, size: 4 },
+        { cx: 3, cy: 6, size: 4 },
+        { cx: 12, cy: 6, size: 4 },
+        { cx: 8, cy: 4, size: 6 },
+    ];
+    
+    // Layer 0 - create clusters
+    clusters.forEach(cluster => {
+        for (let dy = -cluster.size / 2; dy < cluster.size / 2; dy++) {
+            for (let dx = -cluster.size / 2; dx < cluster.size / 2; dx++) {
+                const x = Math.round(cluster.cx + dx);
+                const y = Math.round(cluster.cy + dy);
+                if (x >= 0 && x < 16 && y >= 0 && y < 8) {
+                    positions.push({ x, y, z: 0 });
+                }
+            }
+        }
+    });
+    
+    // Fill gaps
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 16; x++) {
+            if ((x + y) % 3 === 0) {
+                const exists = positions.some(p => p.x === x && p.y === y && p.z === 0);
+                if (!exists) {
+                    positions.push({ x, y, z: 0 });
+                }
+            }
+        }
+    }
+    
+    // Layer 1 - smaller clusters
+    clusters.forEach(cluster => {
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                const x = Math.round(cluster.cx + dx);
+                const y = Math.round(cluster.cy + dy);
+                if (x >= 2 && x < 14 && y >= 1 && y < 7) {
+                    positions.push({ x, y, z: 1 });
+                }
+            }
+        }
+    });
+    
+    // Layer 2 - center only
+    for (let y = 3; y < 6; y++) {
+        for (let x = 6; x < 10; x++) {
+            positions.push({ x, y, z: 2 });
+        }
+    }
+    
+    // Top
+    positions.push({ x: 7.5, y: 4, z: 3 });
+    positions.push({ x: 8.5, y: 4, z: 3 });
+    
+    return positions.slice(0, 144);
+}
+
 // All available layouts
 export const LAYOUTS: Layout[] = [
     turtleLayout,
@@ -273,6 +572,11 @@ export const LAYOUTS: Layout[] = [
     dragonLayout,
     fortressLayout,
     bridgeLayout,
+    spiralLayout,
+    staircaseLayout,
+    diamondLayout,
+    templeLayout,
+    scatterLayout,
 ];
 
 export function getLayoutById(id: string): Layout | undefined {
@@ -285,3 +589,4 @@ export function validateLayout(layout: Layout): boolean {
     // Some layouts might have 142-144 due to centering
     return layout.positions.length >= 140 && layout.positions.length <= 144;
 }
+

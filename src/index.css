@@ -92,7 +92,7 @@ body::before {
 }
 
 .tile-face {
-  @apply rounded-lg flex items-center justify-center text-2xl font-bold;
+  @apply rounded-lg flex items-center justify-center text-3xl font-bold;
   background: linear-gradient(155deg, #fffef9 0%, #f5f0dc 50%, #e8e0c4 100%);
   border: 2px solid var(--color-tile-border);
   box-shadow:
@@ -543,7 +543,7 @@ body::before {
   }
 
   .tile-face {
-    @apply text-lg rounded-md;
+    @apply text-xl rounded-md;
     border-width: 1.5px;
     box-shadow:
       2px 2px 0 var(--color-tile-shadow),
@@ -576,7 +576,7 @@ body::before {
   }
 
   .tile-face {
-    @apply text-base rounded;
+    @apply text-lg rounded;
     border-width: 1px;
   }
 
