@@ -211,31 +211,8 @@ function assignSolvableTypes(positions: { x: number; y: number; z: number }[], a
     return finalTiles;
 }
 
-/**
- * Greedily verify that a board is solvable all the way to the end.
- * Since the generator uses reverse-simulation, if a greedy path exists, 
- * the board is definitely solvable.
- */
-function verifySolvability(tiles: TileInstance[]): boolean {
-    const simulationTiles = tiles.map(t => ({ ...t }));
-    let matchesMade = 0;
-    const totalPairs = simulationTiles.length / 2;
-
-    while (true) {
-        const matches = findAllMatches(simulationTiles);
-        if (matches.length === 0) break;
-
-        // Take a match and continue
-        const [t1, t2] = matches[0];
-        const t1Ref = simulationTiles.find(t => t.id === t1.id);
-        const t2Ref = simulationTiles.find(t => t.id === t2.id);
-        if (t1Ref) t1Ref.isRemoved = true;
-        if (t2Ref) t2Ref.isRemoved = true;
-        matchesMade++;
-    }
-
-    return matchesMade === totalPairs;
-}
+// Greedy verification removed as it rejected non-greedily solvable boards
+// The reverse-simulation itself provides the winnability guarantee.
 
 /**
  * Generate a solvable board
@@ -272,14 +249,19 @@ export function generateBoard(layout: Layout): GameBoard {
     while (attempts < 50) {
         attempts++;
         const tiles = assignSolvableTypes(layout.positions, tilePairs);
-        if (tiles && verifySolvability(tiles)) {
+        if (tiles) {
             return { tiles, layout };
         }
     }
 
-    // High-alert fallback: should not be hit on standard layouts
-    console.error("Failed to generate solvable board in 50 attempts");
-    const basicTiles = assignSolvableTypes(layout.positions, tilePairs) || [];
+    // High-alert fallback
+    console.error("Failed to generate board via reverse simulation, falling back to random assignment");
+    const basicTiles = layout.positions.map((pos, i) => ({
+        id: generateTileId(),
+        typeId: tilePairs[i].id,
+        ...pos,
+        isRemoved: false
+    }));
     return { tiles: basicTiles, layout };
 }
 
@@ -297,7 +279,7 @@ export function shuffleBoard(board: GameBoard): GameBoard {
     while (attempts < 50) {
         attempts++;
         const newActiveTiles = assignSolvableTypes(positions, types);
-        if (newActiveTiles && verifySolvability([...newActiveTiles, ...removedTiles])) {
+        if (newActiveTiles) {
             return {
                 ...board,
                 tiles: [...newActiveTiles, ...removedTiles],

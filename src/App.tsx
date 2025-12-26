@@ -41,15 +41,16 @@ function App() {
     lastMatch,
     zoomLevel,
     setZoomLevel,
-  } = useGameState(isMobile ? 'butterfly' : 'turtle');
+  } = useGameState('turtle');
 
   // Auto-switch to mobile layout on first load if on mobile
   useEffect(() => {
     if (isMobile && !initialLayoutSet) {
-      newGame('butterfly');
+      newGame('flat'); // Use simple flat layout for mobile - proven to work
       setInitialLayoutSet(true);
     }
   }, [isMobile, initialLayoutSet, newGame]);
+
 
   const {
     statistics,
@@ -263,13 +264,10 @@ function App() {
             <h2 className="text-xl font-bold mb-4 text-center">Select Layout</h2>
             <div className="space-y-2">
               {[
-                { id: 'butterfly', name: 'Imperial Butterfly' },
-                { id: 'jewel', name: 'The Jewel' },
-                { id: 'turtle', name: 'Turtle' },
-                { id: 'pyramid', name: 'Pyramid' },
-                { id: 'large', name: 'Large (Easy View)' },
+                { id: 'turtle', name: 'Turtle (Classic)' },
                 { id: 'flat', name: 'Flat (Mobile)' },
-                { id: 'simple', name: 'Simple (Mobile)' },
+                { id: 'simple', name: 'Simple' },
+                { id: 'large', name: 'Large (Easy View)' },
                 { id: 'pyramid', name: 'Pyramid' },
                 { id: 'dragon', name: 'Dragon' },
                 { id: 'fortress', name: 'Fortress' },
@@ -279,6 +277,7 @@ function App() {
                 { id: 'diamond', name: 'Diamond' },
                 { id: 'temple', name: 'Temple' },
                 { id: 'scatter', name: 'Scatter' },
+
               ].map(layout => (
                 <button
                   key={layout.id}
