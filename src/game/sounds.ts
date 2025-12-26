@@ -7,14 +7,10 @@ interface SoundManager {
     play: (sound: SoundType, options?: { pitch?: number; volume?: number }) => void;
     setMuted: (muted: boolean) => void;
     isMuted: () => boolean;
-    startDrone: () => void;
-    stopDrone: () => void;
 }
 
 let audioContext: AudioContext | null = null;
 let muted = false;
-let droneOsc: OscillatorNode | null = null;
-let droneGain: GainNode | null = null;
 
 // Initialize AudioContext on first user interaction
 function getAudioContext(): AudioContext {
@@ -294,45 +290,10 @@ export const soundManager: SoundManager = {
     setMuted: (newMuted: boolean) => {
         muted = newMuted;
         saveMutePreference(newMuted);
-        if (newMuted) {
-            soundManager.stopDrone();
-        } else {
-            soundManager.startDrone();
-        }
     },
 
     isMuted: () => muted,
 
-    startDrone: () => {
-        if (muted || droneOsc) return;
-        try {
-            const ctx = getAudioContext();
-            droneOsc = ctx.createOscillator();
-            droneGain = ctx.createGain();
-
-            droneOsc.type = 'sine';
-            droneOsc.frequency.setValueAtTime(55, ctx.currentTime); // Low A
-
-            droneGain.gain.setValueAtTime(0, ctx.currentTime);
-            droneGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 3);
-
-            droneOsc.connect(droneGain);
-            droneGain.connect(ctx.destination);
-            droneOsc.start();
-        } catch { }
-    },
-
-    stopDrone: () => {
-        if (droneGain) {
-            const ctx = getAudioContext();
-            droneGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.5);
-            setTimeout(() => {
-                droneOsc?.stop();
-                droneOsc = null;
-                droneGain = null;
-            }, 1600);
-        }
-    }
 };
 
 export default soundManager;

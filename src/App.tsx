@@ -11,7 +11,6 @@ import ParticleSystem from './components/ParticleSystem';
 import ComboDisplay from './components/ComboDisplay';
 import { useMobile } from './hooks/useMobile';
 import './index.css';
-import soundManager from './game/sounds';
 
 function App() {
   const { isMobile, isLandscape } = useMobile();
@@ -43,16 +42,6 @@ function App() {
     zoomLevel,
     setZoomLevel,
   } = useGameState(isMobile ? 'flat' : 'turtle');
-
-  // Handle ambient drone lifecycle
-  useEffect(() => {
-    // We import soundManager here or at top
-    if (!gameState.isComplete && !gameState.isStuck) {
-      soundManager.startDrone();
-    } else {
-      soundManager.stopDrone();
-    }
-  }, [gameState.isComplete, gameState.isStuck]);
 
   // Auto-switch to mobile layout on first load if on mobile
   useEffect(() => {

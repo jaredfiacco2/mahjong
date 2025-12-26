@@ -119,8 +119,8 @@ export const Board: React.FC<BoardProps> = ({
                 containerRef.current.style.setProperty('--mouse-px', `${x}%`);
                 containerRef.current.style.setProperty('--mouse-py', `${y}%`);
 
-                const tiltX = ((e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)) * 6;
-                const tiltY = ((e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2)) * -6;
+                const tiltX = ((e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)) * 1.5;
+                const tiltY = ((e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2)) * -1.5;
                 containerRef.current.style.setProperty('--tilt-rx', `${tiltY}deg`);
                 containerRef.current.style.setProperty('--tilt-ry', `${tiltX}deg`);
             }
@@ -170,7 +170,7 @@ export const Board: React.FC<BoardProps> = ({
                     transform: `scale(${scale}) rotateX(var(--tilt-rx)) rotateY(var(--tilt-ry))`,
                     transformStyle: 'preserve-3d',
                     transformOrigin: 'center center',
-                    transition: 'transform 0.1s ease-out',
+                    transition: 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
                 }}
             >
                 <div
