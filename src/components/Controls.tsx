@@ -122,44 +122,38 @@ export const Controls: React.FC<ControlsProps> = ({
 
     return (
         <div className="controls-wrapper w-full">
-            {/* Top stats bar with progress */}
-            <div className="stats-bar fixed top-0 left-0 right-0 z-50">
-                {/* Progress bar at very top */}
-                <div className="progress-bar" style={{ borderRadius: 0, height: '4px' }}>
+            {/* Top HUD with Progress */}
+            <div className="stats-bar fixed top-0 left-0 right-0 z-50 pt-safe">
+                {/* Progress bar at very top - Ultra thin, Apple style */}
+                <div className="progress-bar" style={{ borderRadius: 0, height: '2.5px', background: 'rgba(255,255,255,0.05)' }}>
                     <div
                         className="progress-fill"
                         style={{
                             width: `${progressPercent}%`,
                             borderRadius: 0,
+                            background: 'var(--color-accent-blue)',
+                            boxShadow: '0 0 10px rgba(0, 122, 255, 0.4)'
                         }}
                     />
                 </div>
 
-                {/* Stats panel */}
-                <div className="flex items-center justify-center gap-2 p-2"
-                    style={{
-                        background: 'linear-gradient(to bottom, rgba(5, 13, 26, 0.95) 0%, rgba(5, 13, 26, 0.8) 80%, transparent 100%)',
-                        backdropFilter: 'blur(12px)'
-                    }}>
-                    <div className="stats-panel">
-                        <div className="stat-item">
+                {/* Main HUD Panel */}
+                <div className="flex items-start justify-center p-4">
+                    <div className="stats-panel glass-hud">
+                        <div className="stat-group">
                             <span className="stat-value">{formatTime(elapsedTime)}</span>
-                            <span className="stat-label">Time</span>
+                            <span className="stat-label">Elapsed</span>
                         </div>
-                        <div className="stat-item">
+                        <div className="divider-v"></div>
+                        <div className="stat-group">
                             <span className="stat-value">{tilesRemaining}</span>
-                            <span className="stat-label">Tiles</span>
+                            <span className="stat-label">Remain</span>
                         </div>
-                        <div className="stat-item">
+                        <div className="divider-v"></div>
+                        <div className="stat-group">
                             <span className="stat-value">{matchesMade}</span>
                             <span className="stat-label">Matches</span>
                         </div>
-                    </div>
-
-                    {/* Layout indicator */}
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-white/5 text-sm text-[var(--color-text-muted)]">
-                        {Icons.layout}
-                        <span>{currentLayout.name}</span>
                     </div>
                 </div>
             </div>

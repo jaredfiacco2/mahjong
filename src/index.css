@@ -3,39 +3,40 @@
 
 /* Custom Mahjong Tile Styles - Premium Edition */
 @theme {
-  /* Premium dark theme colors with richer gradients */
-  --color-bg-primary: #050d1a;
-  --color-bg-secondary: #0a192f;
-  --color-bg-tertiary: #112240;
-  --color-bg-card: #1a2f4f;
+  /* Apple-inspired premium dark theme */
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #0a0a0c;
+  --color-bg-tertiary: #161618;
+  --color-bg-card: rgba(28, 28, 30, 0.7);
 
-  /* Tile colors - warmer ivory */
-  --color-tile-face: #faf7ed;
-  --color-tile-shadow: #c9bc8e;
-  --color-tile-border: #9d8a55;
-  --color-tile-selected: #ffc107;
-  --color-tile-hint: #00e676;
+  /* Tile colors - Sophisticated Ivory */
+  --color-tile-face: #ffffff;
+  --color-tile-shadow: #d1d1d6;
+  --color-tile-border: rgba(0, 0, 0, 0.1);
+  --color-tile-selected: #007aff;
+  --color-tile-hint: #34c759;
 
-  /* Text colors */
-  --color-text-primary: #e6f1ff;
-  --color-text-secondary: #a8b2d1;
-  --color-text-muted: #8892b0;
+  /* Text colors - Apple SF Pro feel */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #8e8e93;
+  --color-text-muted: #48484a;
 
-  /* Premium accent colors */
-  --color-accent-gold: #ffc107;
-  --color-accent-red: #ff5252;
-  --color-accent-emerald: #00e676;
-  --color-accent-cyan: #00bcd4;
-  --color-accent-purple: #bb86fc;
+  /* Premium accents */
+  --color-accent-gold: #ff9f0a;
+  --color-accent-red: #ff3b30;
+  --color-accent-emerald: #34c759;
+  --color-accent-cyan: #30d5c8;
+  --color-accent-purple: #bf5af2;
+  --color-accent-blue: #007aff;
 
-  /* Asian-inspired accent */
-  --color-jade: #00c853;
-  --color-crimson: #ff1744;
-  --color-gold: #ffd54f;
+  /* Asian-inspired accent refined */
+  --color-jade: #248a3d;
+  --color-crimson: #af1923;
+  --color-gold: #d4af37;
 
   /* Fonts */
-  --font-display: 'Noto Serif SC', 'Georgia', serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* Base styles with animated gradient background */
@@ -77,65 +78,49 @@ body::before {
   }
 }
 
-/* 3D Tile styling - Enhanced */
+/* 3D Tile styling - Flawless */
 .mahjong-tile {
   @apply relative cursor-pointer select-none;
   width: 44px;
   height: 60px;
-  perspective: 1000px;
+  perspective: 1200px;
   touch-action: manipulation;
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.mahjong-tile:hover:not(.tile-blocked) {
-  z-index: 9999 !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .tile-face {
   @apply rounded-lg flex items-center justify-center text-3xl font-bold;
-  background: linear-gradient(155deg, #fffef9 0%, #f5f0dc 50%, #e8e0c4 100%);
-  border: 2px solid var(--color-tile-border);
+  background: #ffffff;
+  border: 0.5px solid var(--color-tile-border);
   box-shadow:
-    3px 3px 0 var(--color-tile-shadow),
-    4px 4px 1px rgba(0, 0, 0, 0.3),
-    0 8px 16px rgba(0, 0, 0, 0.4);
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    2px 2px 0 #edeef0,
+    3px 3px 0 #d1d1d6,
+    0 10px 20px rgba(0, 0, 0, 0.15);
   transform: translateZ(0);
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
-/* Glossy shine effect on tiles */
-.tile-face::before {
+/* Internal depth for tile face */
+.tile-face::after {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg,
-      transparent 40%,
-      rgba(255, 255, 255, 0.15) 45%,
-      rgba(255, 255, 255, 0.25) 50%,
-      rgba(255, 255, 255, 0.15) 55%,
-      transparent 60%);
-  transform: translateX(-100%) rotate(45deg);
-  transition: transform 0.6s ease;
+  inset: 2px;
+  border-radius: 6px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(0, 0, 0, 0.05);
   pointer-events: none;
 }
 
-.mahjong-tile:hover:not(.tile-blocked) .tile-face::before {
-  transform: translateX(100%) rotate(45deg);
-}
-
-/* Enhanced hover effect */
+/* Enhanced hover effect - Minimalist & Smooth */
 .mahjong-tile:hover:not(.tile-blocked) .tile-face {
-  transform: translateY(-4px) scale(1.08);
+  transform: translateY(-2px) scale(1.04);
   box-shadow:
-    3px 3px 0 var(--color-tile-shadow),
-    6px 6px 2px rgba(0, 0, 0, 0.25),
-    0 15px 30px rgba(0, 0, 0, 0.5),
-    0 0 15px rgba(255, 193, 7, 0.2);
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    2px 2px 0 #edeef0,
+    3px 3px 0 #d1d1d6,
+    0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 /* Layered tile depth effect - Enhanced */
@@ -381,7 +366,40 @@ body::before {
 }
 
 .stat-label {
-  @apply text-xs text-[var(--color-text-muted)] uppercase tracking-widest font-medium;
+  @apply text-[10px] text-[var(--color-text-secondary)] uppercase font-semibold;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+/* Glass HUD Panel - Sophisticated */
+.glass-hud {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1.75rem;
+  background: rgba(28, 28, 30, 0.55);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 20px;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.stat-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.divider-v {
+  width: 0.5px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
 }
 
 /* Progress bar */
@@ -535,59 +553,64 @@ body::before {
   }
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 480px) {
+/* Mobile responsive adjustments - Apple Style */
+@media (max-width: 768px) {
   .mahjong-tile {
-    width: 34px;
-    height: 46px;
+    width: 38px;
+    height: 52px;
   }
 
   .tile-face {
-    @apply text-xl rounded-md;
-    border-width: 1.5px;
+    @apply text-2xl rounded-md;
+    border-width: 0.5px;
     box-shadow:
-      2px 2px 0 var(--color-tile-shadow),
-      3px 3px 1px rgba(0, 0, 0, 0.3),
-      0 6px 12px rgba(0, 0, 0, 0.4);
+      0 1px 2px rgba(0, 0, 0, 0.1),
+      1.5px 1.5px 0 #edeef0,
+      2px 2px 0 #d1d1d6,
+      0 5px 10px rgba(0, 0, 0, 0.1);
   }
 
-  .stats-panel {
-    @apply gap-3 px-3 py-2 rounded-xl;
+  .glass-hud {
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 16px;
+    max-width: 90vw;
+  }
+
+  .stat-group {
+    min-width: 45px;
+  }
+
+  .stat-value {
+    @apply text-xl;
+  }
+
+  .game-button-icon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mahjong-tile {
+    width: 32px;
+    height: 44px;
+  }
+
+  .tile-face {
+    @apply text-xl;
   }
 
   .stat-value {
     @apply text-lg;
   }
 
-  .game-button-icon {
-    width: 46px;
-    height: 46px;
-  }
-
-  .win-title {
-    @apply text-4xl;
+  .control-bar {
+    gap: 0.5rem;
+    padding: 1rem 0.5rem;
   }
 }
 
-@media (max-width: 360px) {
-  .mahjong-tile {
-    width: 28px;
-    height: 38px;
-  }
-
-  .tile-face {
-    @apply text-lg rounded;
-    border-width: 1px;
-  }
-
-  .stat-value {
-    @apply text-base;
-  }
-
-  .win-title {
-    @apply text-3xl;
-  }
-}
 
 /* Board container with auto-scaling */
 .board-container {

@@ -9,9 +9,11 @@ import WinCelebration from './components/WinCelebration';
 import GameOverModal from './components/GameOverModal';
 import ParticleSystem from './components/ParticleSystem';
 import ComboDisplay from './components/ComboDisplay';
+import { useMobile } from './hooks/useMobile';
 import './index.css';
 
 function App() {
+  const { isMobile, orientation } = useMobile();
   const {
     gameState,
     freeTiles,
@@ -101,7 +103,7 @@ function App() {
 
   return (
     <div
-      className={`app min-h-screen flex flex-col pt-16 pb-20 ${screenShake ? 'screen-shake' : ''}`}
+      className={`app min-h-screen flex flex-col pt-16 pb-20 ${screenShake ? 'screen-shake' : ''} ${isMobile ? 'mobile-mode' : ''} ${orientation}`}
       style={{
         // Screen shake animation
         animation: screenShake ? 'shake 0.2s ease-in-out' : 'none',

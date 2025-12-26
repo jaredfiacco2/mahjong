@@ -112,64 +112,123 @@ export function checkStuck(tiles: TileInstance[]): boolean {
 }
 
 /**
+ * Check if a position is "open" for placement during reverse generation.
+ * A position is open if it has no tiles on top and no tiles on BOTH sides.
+ * This is the reverse of being "free" to remove.
+ */
+function isPositionAvailable(
+    pos: { x: number; y: number; z: number },
+    occupiedPositions: { x: number; y: number; z: number }[]
+): boolean {
+    // Check if any position is directly on top
+    const hasTop = occupiedPositions.some(other =>
+        other.z > pos.z &&
+        Math.abs(other.x - pos.x) < 0.9 &&
+        Math.abs(other.y - pos.y) < 0.9
+    );
+    if (hasTop) return false;
+
+    // In reverse, we can place if it doesn't block BOTH sides of something already there,
+    // OR if it's not blocked on BOTH sides itself. 
+    // Simpler: Just allow placement if it would BE FREE once placed.
+    const hasLeft = occupiedPositions.some(other =>
+        other.z === pos.z &&
+        Math.abs(other.y - pos.y) < 0.9 &&
+        other.x < pos.x && pos.x - other.x < 1.1
+    );
+
+    const hasRight = occupiedPositions.some(other =>
+        other.z === pos.z &&
+        Math.abs(other.y - pos.y) < 0.9 &&
+        other.x > pos.x && other.x - pos.x < 1.1
+    );
+
+    return !hasLeft || !hasRight;
+}
+
+/**
  * Generate a solvable board
- * Strategy: Place tiles in pairs, ensuring each pair can eventually be matched
+ * Strategy: Reverse play simulation.
+ * 1. Start with all potential positions from layout.
+ * 2. Pick Two positions that are "free" (as if the board were full).
+ * 3. Place a matching pair there.
+ * 4. Repeat until all positions filled or no more pairs can be placed.
  */
 export function generateBoard(layout: Layout): GameBoard {
     resetTileIdCounter();
 
-    const positions = [...layout.positions].slice(0, 144);
+    const allPositions = [...layout.positions].slice(0, 144);
+    const occupiedPositions: { x: number; y: number; z: number }[] = [];
+    const availablePositions = [...allPositions];
+    
+    // Prepare tiles
+    const tilePairs: TileType[] = [];
+    STANDARD_TILES.forEach(tileType => {
+        for (let i = 0; i < 4; i++) tilePairs.push(tileType);
+    });
+    const bonusGrouped = ALL_TILE_TYPES.filter(t => t.matchGroup);
+    bonusGrouped.forEach(tileType => tilePairs.push(tileType));
+    
+    const shuffledTypes = shuffleArray([...tilePairs]);
+    const finalTiles: TileInstance[] = [];
 
-    // If we don't have exactly 144 positions, pad or trim
-    while (positions.length < 144) {
-        // Add more positions if needed (shouldn't happen with proper layouts)
-        const lastPos = positions[positions.length - 1] || { x: 0, y: 0, z: 0 };
-        positions.push({ x: lastPos.x + 1, y: lastPos.y, z: lastPos.z });
+    // Reverse simulation placement
+    // We need to place 72 pairs
+    for (let p = 0; p < 72; p++) {
+        // Find all currently "placeable" positions
+        // A position is placeable if it would be "free" given currently occupied positions
+        const placeableIndices = availablePositions.filter(pos => 
+            isPositionAvailable(pos, occupiedPositions)
+        );
+
+        if (placeableIndices.length < 2) {
+            // Fallback if layout is complex, but should work for standard layouts
+            break;
+        }
+
+        // Pick two random placeable positions
+        const idx1 = Math.floor(Math.random() * placeableIndices.length);
+        let idx2 = Math.floor(Math.random() * placeableIndices.length);
+        while (idx2 === idx1 && placeableIndices.length > 1) {
+            idx2 = Math.floor(Math.random() * placeableIndices.length);
+        }
+
+        const pos1 = placeableIndices[idx1];
+        const pos2 = placeableIndices[idx2];
+
+        // Fill them with current pair types
+        const type1 = shuffledTypes[p * 2];
+        const type2 = shuffledTypes[p * 2 + 1];
+
+        finalTiles.push({
+            id: generateTileId(),
+            typeId: type1.id,
+            x: pos1.x,
+            y: pos1.y,
+            z: pos1.z,
+            isRemoved: false,
+        });
+
+        finalTiles.push({
+            id: generateTileId(),
+            typeId: type2.id,
+            x: pos2.x,
+            y: pos2.y,
+            z: pos2.z,
+            isRemoved: false,
+        });
+
+        // Update tracking
+        occupiedPositions.push(pos1, pos2);
+        
+        // Remove from available
+        const pos1Idx = availablePositions.indexOf(pos1);
+        availablePositions.splice(pos1Idx, 1);
+        const pos2Idx = availablePositions.indexOf(pos2);
+        availablePositions.splice(pos2Idx, 1);
     }
 
-    // Create tile pairs
-    // We need 72 pairs - use 34 standard tile types x 2 pairs each = 68 pairs
-    // Plus 4 bonus pairs (seasons, flowers)
-    const tilePairs: TileType[] = [];
-
-    // Add each standard tile 4 times (making 2 pairs)
-    STANDARD_TILES.forEach(tileType => {
-        for (let i = 0; i < 4; i++) {
-            tilePairs.push(tileType);
-        }
-    });
-
-    // Add bonus tiles (each appears once, but matches within category)
-    const bonusTiles = ALL_TILE_TYPES.filter(t => t.matchGroup);
-    bonusTiles.forEach(tileType => {
-        tilePairs.push(tileType);
-    });
-
-    // Shuffle tile types
-    const shuffledTypes = shuffleArray([...tilePairs]).slice(0, 144);
-
-    // Sort positions by z (top to bottom), then by accessibility
-    // We want to place pairs such that one is always accessible before the other
-    const sortedPositions = [...positions].sort((a, b) => {
-        // Higher z first (will be placed last = more accessible)
-        if (b.z !== a.z) return b.z - a.z;
-        // Then by y
-        if (a.y !== b.y) return a.y - b.y;
-        // Then by x (edges first)
-        return Math.abs(a.x - 7) - Math.abs(b.x - 7);
-    });
-
-    // Place tiles
-    const tiles: TileInstance[] = sortedPositions.map((pos, index) => ({
-        id: generateTileId(),
-        typeId: shuffledTypes[index % shuffledTypes.length].id,
-        x: pos.x,
-        y: pos.y,
-        z: pos.z,
-        isRemoved: false,
-    }));
-
-    return { tiles, layout };
+    return { tiles: finalTiles, layout };
 }
 
 /**

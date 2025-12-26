@@ -100,10 +100,10 @@ export const Board: React.FC<BoardProps> = ({
         return () => window.removeEventListener('resize', handleResize);
     }, [updateScale]);
 
-    // Also update when tiles change (layout change)
     useEffect(() => {
-        updateScale();
-    }, [tiles.length, updateScale]);
+        const timeout = setTimeout(updateScale, 100); // Small delay to let container settle
+        return () => clearTimeout(timeout);
+    }, [tiles, updateScale]);
 
     const hintSet = useMemo(() => {
         if (!hintPair) return new Set<string>();
