@@ -30,8 +30,7 @@ interface ParticleSystemProps {
 }
 
 const COLORS = [
-    '#ffd54f', '#ffab00', '#ff6d00', '#ff5252',
-    '#e040fb', '#7c4dff', '#448aff', '#00e676', '#00bcd4'
+    '#c5a059', '#d4af37', '#ffffff', '#248a3d', '#006400', '#f5f5f7'
 ];
 
 export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onComplete }) => {
@@ -40,12 +39,12 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
 
     // Create explosion of particles at position
     const createExplosion = useCallback((x: number, y: number, combo: number) => {
-        const particleCount = 15 + combo * 8; // More particles for combos
+        const particleCount = 20 + combo * 10;
         const newParticles: Particle[] = [];
 
         for (let i = 0; i < particleCount; i++) {
             const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
-            const speed = 3 + Math.random() * 5 + combo;
+            const speed = 4 + Math.random() * 6 + combo * 0.5;
             const types: ('circle' | 'star' | 'square')[] = ['circle', 'star', 'square'];
 
             newParticles.push({
@@ -55,11 +54,11 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
                 color: COLORS[Math.floor(Math.random() * COLORS.length)],
-                size: 4 + Math.random() * 6 + combo,
-                life: 60 + combo * 10,
-                maxLife: 60 + combo * 10,
+                size: 2 + Math.random() * 5 + combo * 0.2,
+                life: 80 + combo * 10,
+                maxLife: 80 + combo * 10,
                 rotation: Math.random() * 360,
-                rotationSpeed: (Math.random() - 0.5) * 20,
+                rotationSpeed: (Math.random() - 0.5) * 25,
                 type: types[Math.floor(Math.random() * types.length)],
             });
         }
@@ -93,12 +92,11 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
                     .map(p => ({
                         ...p,
                         x: p.x + p.vx,
-                        y: p.y + p.vy + 0.3, // gravity
-                        vy: p.vy + 0.15,
-                        vx: p.vx * 0.98,
+                        y: p.y + p.vy + 0.2, // softer gravity
+                        vy: p.vy + 0.1,
+                        vx: p.vx * 0.97,
                         life: p.life - 1,
                         rotation: p.rotation + p.rotationSpeed,
-                        size: p.size * 0.98,
                     }))
                     .filter(p => p.life > 0)
             );
@@ -107,8 +105,8 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
                 prev
                     .map(e => ({
                         ...e,
-                        scale: e.scale + 0.15,
-                        opacity: e.opacity - 0.03,
+                        scale: e.scale + 0.1,
+                        opacity: e.opacity - 0.02,
                     }))
                     .filter(e => e.opacity > 0)
             );
@@ -133,8 +131,8 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
             style={{ width: '100%', height: '100%' }}
         >
             <defs>
-                <filter id="particleGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
+                <filter id="boutiqueGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
                     <feMerge>
                         <feMergeNode in="blur" />
                         <feMergeNode in="SourceGraphic" />
@@ -148,25 +146,26 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
                     key={effect.id}
                     cx={effect.x}
                     cy={effect.y}
-                    r={30 + effect.scale * 50}
+                    r={20 + effect.scale * 60}
                     fill="none"
-                    stroke="#ffc107"
-                    strokeWidth={3 - effect.scale * 2}
+                    stroke="#c5a059"
+                    strokeWidth={4 - effect.scale * 3}
                     opacity={effect.opacity}
-                    filter="url(#particleGlow)"
+                    filter="url(#boutiqueGlow)"
                 />
             ))}
 
-            {/* Particles */}
+            {/* Gemstone Shards */}
             {particles.map(p => {
                 const opacity = p.life / p.maxLife;
 
                 if (p.type === 'star') {
-                    // 4-point star
+                    // Shard polygon
                     const points = [];
-                    for (let i = 0; i < 8; i++) {
-                        const angle = (Math.PI * 2 * i) / 8 + (p.rotation * Math.PI / 180);
-                        const r = i % 2 === 0 ? p.size : p.size * 0.4;
+                    const sides = 3 + Math.floor(Math.random() * 3);
+                    for (let i = 0; i < sides; i++) {
+                        const angle = (Math.PI * 2 * i) / sides + (p.rotation * Math.PI / 180);
+                        const r = p.size * (0.5 + Math.random() * 0.5);
                         points.push(`${p.x + Math.cos(angle) * r},${p.y + Math.sin(angle) * r}`);
                     }
                     return (
@@ -175,36 +174,22 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
                             points={points.join(' ')}
                             fill={p.color}
                             opacity={opacity}
-                            filter="url(#particleGlow)"
-                        />
-                    );
-                }
-
-                if (p.type === 'square') {
-                    return (
-                        <rect
-                            key={p.id}
-                            x={p.x - p.size / 2}
-                            y={p.y - p.size / 2}
-                            width={p.size}
-                            height={p.size}
-                            fill={p.color}
-                            opacity={opacity}
-                            transform={`rotate(${p.rotation} ${p.x} ${p.y})`}
-                            filter="url(#particleGlow)"
+                            filter="url(#boutiqueGlow)"
                         />
                     );
                 }
 
                 return (
-                    <circle
+                    <rect
                         key={p.id}
-                        cx={p.x}
-                        cy={p.y}
-                        r={p.size}
+                        x={p.x - p.size / 2}
+                        y={p.y - p.size / 2}
+                        width={p.size}
+                        height={p.size / 2}
                         fill={p.color}
                         opacity={opacity}
-                        filter="url(#particleGlow)"
+                        transform={`rotate(${p.rotation} ${p.x} ${p.y})`}
+                        filter="url(#boutiqueGlow)"
                     />
                 );
             })}

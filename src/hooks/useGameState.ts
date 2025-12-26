@@ -251,6 +251,15 @@ export function useGameState(initialLayoutId: string = 'turtle'): UseGameStateRe
                     soundManager.play('match');
                 }
 
+                // Haptic feedback for mobile
+                if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                    if (newCombo >= 3) {
+                        navigator.vibrate([20, 30, 20]); // Combo pulse
+                    } else {
+                        navigator.vibrate(10); // Subtle match pulse
+                    }
+                }
+
                 const points = calculateMatchPoints(newCombo, elapsedTime);
                 const newTiles = removeTilePair(prev.board.tiles, selectedTile.id, tile.id);
                 const isComplete = checkWin(newTiles);
@@ -258,6 +267,9 @@ export function useGameState(initialLayoutId: string = 'turtle'): UseGameStateRe
 
                 if (isComplete) {
                     soundManager.play('win');
+                    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                        navigator.vibrate([50, 100, 50, 100, 50]); // Win celebration vibration
+                    }
                 }
 
                 // Calculate match position for particles (average of both tiles)

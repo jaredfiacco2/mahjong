@@ -16,16 +16,14 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
     useEffect(() => {
         if (combo > 0) {
             setDisplayCombo(combo);
-            setComboScale(1.5);
-            setTimeout(() => setComboScale(1), 150);
+            setComboScale(1.8);
+            setTimeout(() => setComboScale(1), 200);
         } else {
-            // Fade out combo after delay
             const timer = setTimeout(() => setDisplayCombo(0), 1000);
             return () => clearTimeout(timer);
         }
     }, [combo]);
 
-    // Show floating points
     useEffect(() => {
         if (lastMatchPoints) {
             setShowPoints(true);
@@ -35,45 +33,45 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
     }, [lastMatchPoints]);
 
     const getComboColor = () => {
-        if (combo >= 5) return 'linear-gradient(135deg, #ff1744 0%, #ff6d00 100%)';
-        if (combo >= 3) return 'linear-gradient(135deg, #ff6d00 0%, #ffc107 100%)';
-        if (combo >= 2) return 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)';
-        return 'linear-gradient(135deg, #00e676 0%, #00bcd4 100%)';
+        if (combo >= 5) return 'linear-gradient(135deg, #c5a059 0%, #d4af37 50%, #fff 100%)';
+        if (combo >= 3) return 'linear-gradient(135deg, #c5a059 0%, #ffd700 100%)';
+        return 'var(--color-royal-gold)';
     };
 
     const getComboText = () => {
-        if (combo >= 5) return 'ON FIRE!';
-        if (combo >= 4) return 'AMAZING!';
-        if (combo >= 3) return 'GREAT!';
-        if (combo >= 2) return 'NICE!';
-        return '';
+        if (combo >= 10) return 'MAJESTIC';
+        if (combo >= 7) return 'UNSTOPPABLE';
+        if (combo >= 5) return 'BOUTIQUE';
+        if (combo >= 3) return 'IMPERIAL';
+        return 'STREAK';
     };
 
     return (
         <>
-            {/* Score display - fixed top right */}
-            <div className="fixed top-16 right-4 z-50 text-right">
-                <div className="text-sm text-[var(--color-text-muted)] uppercase tracking-wider">Score</div>
+            {/* Prestige Score display */}
+            <div className="fixed top-12 right-6 z-50 text-right">
+                <div className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold mb-1">BOUTIQUE SCORE</div>
                 <div
-                    className="text-3xl font-bold tabular-nums"
+                    className="text-4xl font-black italic tracking-tighter tabular-nums"
                     style={{
-                        background: 'linear-gradient(135deg, #ffc107 0%, #ff6d00 100%)',
+                        background: 'linear-gradient(135deg, #c5a059 0%, #ffffff 50%, #c5a059 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text',
-                        textShadow: '0 2px 20px rgba(255, 193, 7, 0.3)',
+                        filter: 'drop-shadow(0 4px 12px rgba(197, 160, 89, 0.3))',
                     }}
                 >
                     {score.toLocaleString()}
                 </div>
 
-                {/* Floating points animation */}
+                {/* Floating points */}
                 {showPoints && lastMatchPoints && (
                     <div
-                        className="absolute right-0 text-xl font-bold"
+                        className="absolute right-0 text-xl font-bold italic"
                         style={{
-                            color: combo > 1 ? '#ff6d00' : '#00e676',
-                            animation: 'floatUp 1s ease-out forwards',
+                            color: '#c5a059',
+                            animation: 'floatUpGold 1.2s cubic-bezier(0.2, 0, 0.2, 1) forwards',
+                            textShadow: '0 0 20px rgba(197, 160, 89, 0.5)'
                         }}
                     >
                         +{lastMatchPoints}
@@ -81,49 +79,48 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
                 )}
             </div>
 
-            {/* Combo display - center screen */}
+            {/* Prestige Combo display */}
             {displayCombo >= 2 && (
                 <div
                     className="fixed top-1/4 left-1/2 -translate-x-1/2 z-50 text-center pointer-events-none"
-                    style={{
-                        animation: 'comboAppear 0.3s ease-out',
-                    }}
+                    style={{ animation: 'comboPrestigeAppear 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
                 >
                     <div
-                        className="text-6xl font-black mb-2"
+                        className={`text-8xl font-black italic tracking-tighter shimmer-gold`}
                         style={{
                             background: getComboColor(),
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             backgroundClip: 'text',
                             transform: `scale(${comboScale})`,
-                            transition: 'transform 0.15s ease-out',
-                            filter: 'drop-shadow(0 4px 20px rgba(255, 107, 0, 0.5))',
+                            transition: 'transform 0.2s cubic-bezier(0.2, 1, 0.2, 1)',
+                            filter: 'drop-shadow(0 10px 30px rgba(197, 160, 89, 0.6))',
                         }}
                     >
                         {combo}x
                     </div>
-                    <div
-                        className="text-xl font-bold text-white"
-                        style={{
-                            textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-                        }}
-                    >
+                    <div className="text-sm font-bold tracking-[0.5em] text-white/60 uppercase mt-[-10px]">
                         {getComboText()}
                     </div>
                 </div>
             )}
 
-            {/* CSS for animations */}
             <style>{`
-                @keyframes floatUp {
-                    0% { opacity: 1; transform: translateY(0); }
-                    100% { opacity: 0; transform: translateY(-40px); }
+                @keyframes floatUpGold {
+                    0% { opacity: 0; transform: translateY(0) scale(0.8); }
+                    20% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+                    100% { opacity: 0; transform: translateY(-60px) scale(1); }
                 }
-                @keyframes comboAppear {
-                    0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
-                    50% { transform: translate(-50%, 0) scale(1.2); }
+                @keyframes comboPrestigeAppear {
+                    0% { opacity: 0; transform: translate(-50%, 20px) scale(0.8); }
                     100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+                }
+                .shimmer-gold {
+                    background-size: 200% auto !important;
+                    animation: goldShimmer 3s linear infinite;
+                }
+                @keyframes goldShimmer {
+                    to { background-position: 200% center; }
                 }
             `}</style>
         </>
