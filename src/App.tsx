@@ -230,21 +230,36 @@ function App() {
           onClick={() => setShowLayoutSelector(false)}
         >
           <div
-            className="modal-content"
+            className="modal-content max-h-[80vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4 text-center">Select Layout</h2>
             <div className="space-y-2">
-              {['turtle', 'pyramid', 'dragon', 'fortress', 'bridge'].map(layoutId => (
+              {[
+                { id: 'turtle', name: 'Turtle', emoji: '🐢' },
+                { id: 'large', name: 'Large (Easy View)', emoji: '👁️' },
+                { id: 'flat', name: 'Flat (Mobile)', emoji: '📱' },
+                { id: 'simple', name: 'Simple (Mobile)', emoji: '📋' },
+                { id: 'pyramid', name: 'Pyramid', emoji: '🔺' },
+                { id: 'dragon', name: 'Dragon', emoji: '🐉' },
+                { id: 'fortress', name: 'Fortress', emoji: '🏰' },
+                { id: 'bridge', name: 'Bridge', emoji: '🌉' },
+                { id: 'spiral', name: 'Spiral', emoji: '🌀' },
+                { id: 'staircase', name: 'Staircase', emoji: '📶' },
+                { id: 'diamond', name: 'Diamond', emoji: '💎' },
+                { id: 'temple', name: 'Temple', emoji: '⛩️' },
+                { id: 'scatter', name: 'Scatter', emoji: '✨' },
+              ].map(layout => (
                 <button
-                  key={layoutId}
-                  className="game-button w-full capitalize flex items-center gap-3"
-                  onClick={() => handleNewGame(layoutId)}
+                  key={layout.id}
+                  className={`game-button w-full flex items-center gap-3 ${currentLayout.id === layout.id ? 'ring-2 ring-[var(--color-accent-gold)]' : ''}`}
+                  onClick={() => handleNewGame(layout.id)}
                 >
-                  <span className="text-lg">
-                    {layoutId === 'turtle' ? '🐢' : layoutId === 'pyramid' ? '🔺' : layoutId === 'dragon' ? '🐉' : layoutId === 'fortress' ? '🏰' : '🌉'}
-                  </span>
-                  {layoutId}
+                  <span className="text-lg">{layout.emoji}</span>
+                  <span className="flex-1 text-left">{layout.name}</span>
+                  {currentLayout.id === layout.id && (
+                    <span className="text-xs text-[var(--color-accent-gold)]">Current</span>
+                  )}
                 </button>
               ))}
             </div>

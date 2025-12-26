@@ -614,9 +614,66 @@ function generateSimplePositions(): LayoutPosition[] {
     return positions.slice(0, 144);
 }
 
+// Large layout - accessibility-focused, more vertical stacking, fewer tiles per layer
+const largeLayout: Layout = {
+    id: 'large',
+    name: 'Large (Easy View)',
+    description: 'Fewer tiles per layer, more stacking - easier to see',
+    positions: generateLargePositions(),
+};
+
+function generateLargePositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+
+    // Layer 0 - 6x6 grid = 36 tiles
+    for (let y = 0; y < 6; y++) {
+        for (let x = 0; x < 6; x++) {
+            positions.push({ x, y, z: 0 });
+        }
+    }
+
+    // Layer 1 - 6x6 grid offset = 36 tiles
+    for (let y = 0; y < 6; y++) {
+        for (let x = 0; x < 6; x++) {
+            positions.push({ x: x + 0.5, y: y + 0.5, z: 1 });
+        }
+    }
+
+    // Layer 2 - 6x6 grid = 36 tiles
+    for (let y = 0; y < 6; y++) {
+        for (let x = 0; x < 6; x++) {
+            positions.push({ x, y, z: 2 });
+        }
+    }
+
+    // Layer 3 - 4x4 center = 16 tiles
+    for (let y = 1; y < 5; y++) {
+        for (let x = 1; x < 5; x++) {
+            positions.push({ x: x + 0.5, y: y + 0.5, z: 3 });
+        }
+    }
+
+    // Layer 4 - 4x4 center = 16 tiles
+    for (let y = 1; y < 5; y++) {
+        for (let x = 1; x < 5; x++) {
+            positions.push({ x, y, z: 4 });
+        }
+    }
+
+    // Top layers - 2x2 = 4 tiles
+    for (let y = 2; y < 4; y++) {
+        for (let x = 2; x < 4; x++) {
+            positions.push({ x: x + 0.5, y: y + 0.5, z: 5 });
+        }
+    }
+
+    return positions.slice(0, 144);
+}
+
 // All available layouts
 export const LAYOUTS: Layout[] = [
     turtleLayout,
+    largeLayout,
     flatLayout,
     simpleLayout,
     pyramidLayout,
