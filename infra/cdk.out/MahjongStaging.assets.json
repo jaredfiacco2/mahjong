@@ -1,0 +1,81 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "MahjongStaging/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "530880126084-us-east-1-7e87925b": {
+          "bucketName": "cdk-hnb659fds-assets-530880126084-us-east-1",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::530880126084:role/cdk-hnb659fds-file-publishing-role-530880126084-us-east-1"
+        }
+      }
+    },
+    "c49d356cac773d491c5f7ac148995a1181498a8e289429f8612a7f7e3814f535": {
+      "displayName": "StageDeploy/AwsCliLayer/Code",
+      "source": {
+        "path": "asset.c49d356cac773d491c5f7ac148995a1181498a8e289429f8612a7f7e3814f535.zip",
+        "packaging": "file"
+      },
+      "destinations": {
+        "530880126084-us-east-1-9d3d548f": {
+          "bucketName": "cdk-hnb659fds-assets-530880126084-us-east-1",
+          "objectKey": "c49d356cac773d491c5f7ac148995a1181498a8e289429f8612a7f7e3814f535.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::530880126084:role/cdk-hnb659fds-file-publishing-role-530880126084-us-east-1"
+        }
+      }
+    },
+    "3423a042b818e31c1e34a19d6689ab2e5f9b70fcbe9e71df66f241b20a200bd9": {
+      "displayName": "Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Code",
+      "source": {
+        "path": "asset.3423a042b818e31c1e34a19d6689ab2e5f9b70fcbe9e71df66f241b20a200bd9",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "530880126084-us-east-1-bd9389b3": {
+          "bucketName": "cdk-hnb659fds-assets-530880126084-us-east-1",
+          "objectKey": "3423a042b818e31c1e34a19d6689ab2e5f9b70fcbe9e71df66f241b20a200bd9.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::530880126084:role/cdk-hnb659fds-file-publishing-role-530880126084-us-east-1"
+        }
+      }
+    },
+    "7c2bb03618c9635a6fb7149fc25ef22de69cfebcebbf0810a57d46cca0180252": {
+      "displayName": "StageDeploy/Asset1",
+      "source": {
+        "path": "asset.7c2bb03618c9635a6fb7149fc25ef22de69cfebcebbf0810a57d46cca0180252",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "530880126084-us-east-1-e3f5ba91": {
+          "bucketName": "cdk-hnb659fds-assets-530880126084-us-east-1",
+          "objectKey": "7c2bb03618c9635a6fb7149fc25ef22de69cfebcebbf0810a57d46cca0180252.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::530880126084:role/cdk-hnb659fds-file-publishing-role-530880126084-us-east-1"
+        }
+      }
+    },
+    "eb9cb61ecab5d62511d1a19b4a1aadd926a6803bfdd3bb9767d33a41a6d2e3f9": {
+      "displayName": "MahjongStaging Template",
+      "source": {
+        "path": "MahjongStaging.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "530880126084-us-east-1-9d6d486a": {
+          "bucketName": "cdk-hnb659fds-assets-530880126084-us-east-1",
+          "objectKey": "eb9cb61ecab5d62511d1a19b4a1aadd926a6803bfdd3bb9767d33a41a6d2e3f9.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::530880126084:role/cdk-hnb659fds-file-publishing-role-530880126084-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

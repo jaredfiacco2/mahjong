@@ -1,0 +1,22 @@
+{
+    "name": "mahjong-infra",
+    "version": "0.1.0",
+    "bin": {
+        "mahjong-infra": "bin/mahjong.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "cdk": "cdk"
+    },
+    "devDependencies": {
+        "@types/node": "22.x",
+        "aws-cdk": "2.x",
+        "typescript": "~5.7.2"
+    },
+    "dependencies": {
+        "aws-cdk-lib": "2.x",
+        "constructs": "^10.0.0",
+        "source-map-support": "^0.5.21",
+        "ts-node": "^10.9.2"
+    }
+}
