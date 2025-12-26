@@ -127,11 +127,14 @@ function App() {
       {/* Zoom controls - Fixed top-left */}
       <div className="fixed top-16 left-4 z-50 flex flex-col gap-2">
         <button
-          className="game-button game-button-icon w-10 h-10 text-lg"
+          className="game-button game-button-icon w-10 h-10 text-sm font-bold"
           onClick={() => setShowZoomControls(!showZoomControls)}
           title="Zoom controls"
         >
-          🔍
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
         </button>
 
         {showZoomControls && (
@@ -236,27 +239,26 @@ function App() {
             <h2 className="text-xl font-bold mb-4 text-center">Select Layout</h2>
             <div className="space-y-2">
               {[
-                { id: 'turtle', name: 'Turtle', emoji: '🐢' },
-                { id: 'large', name: 'Large (Easy View)', emoji: '👁️' },
-                { id: 'flat', name: 'Flat (Mobile)', emoji: '📱' },
-                { id: 'simple', name: 'Simple (Mobile)', emoji: '📋' },
-                { id: 'pyramid', name: 'Pyramid', emoji: '🔺' },
-                { id: 'dragon', name: 'Dragon', emoji: '🐉' },
-                { id: 'fortress', name: 'Fortress', emoji: '🏰' },
-                { id: 'bridge', name: 'Bridge', emoji: '🌉' },
-                { id: 'spiral', name: 'Spiral', emoji: '🌀' },
-                { id: 'staircase', name: 'Staircase', emoji: '📶' },
-                { id: 'diamond', name: 'Diamond', emoji: '💎' },
-                { id: 'temple', name: 'Temple', emoji: '⛩️' },
-                { id: 'scatter', name: 'Scatter', emoji: '✨' },
+                { id: 'turtle', name: 'Turtle' },
+                { id: 'large', name: 'Large (Easy View)' },
+                { id: 'flat', name: 'Flat (Mobile)' },
+                { id: 'simple', name: 'Simple (Mobile)' },
+                { id: 'pyramid', name: 'Pyramid' },
+                { id: 'dragon', name: 'Dragon' },
+                { id: 'fortress', name: 'Fortress' },
+                { id: 'bridge', name: 'Bridge' },
+                { id: 'spiral', name: 'Spiral' },
+                { id: 'staircase', name: 'Staircase' },
+                { id: 'diamond', name: 'Diamond' },
+                { id: 'temple', name: 'Temple' },
+                { id: 'scatter', name: 'Scatter' },
               ].map(layout => (
                 <button
                   key={layout.id}
-                  className={`game-button w-full flex items-center gap-3 ${currentLayout.id === layout.id ? 'ring-2 ring-[var(--color-accent-gold)]' : ''}`}
+                  className={`game-button w-full flex items-center justify-between ${currentLayout.id === layout.id ? 'ring-2 ring-[var(--color-accent-gold)]' : ''}`}
                   onClick={() => handleNewGame(layout.id)}
                 >
-                  <span className="text-lg">{layout.emoji}</span>
-                  <span className="flex-1 text-left">{layout.name}</span>
+                  <span>{layout.name}</span>
                   {currentLayout.id === layout.id && (
                     <span className="text-xs text-[var(--color-accent-gold)]">Current</span>
                   )}
