@@ -180,11 +180,21 @@ function assignSolvableTypes(positions: { x: number; y: number; z: number }[], a
         }
     }
 
-    // Shuffle pair placement order
+    // Shuffle pair placement order for variety
     for (let i = matchingPairs.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [matchingPairs[i], matchingPairs[j]] = [matchingPairs[j], matchingPairs[i]];
     }
+
+    // Helper: calculate distance between positions
+    const getDistance = (p1: { x: number; y: number; z: number }, p2: { x: number; y: number; z: number }) => {
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        return Math.sqrt(dx * dx + dy * dy); // 2D distance (same layer proximity matters most)
+    };
+
+    // Minimum distance for matching pairs - prevents adjacent matches
+    const MIN_DISTANCE = 2.5;
 
     for (const [type1, type2] of matchingPairs) {
         const placeablePositions = availablePositions.filter(pos =>
@@ -193,13 +203,38 @@ function assignSolvableTypes(positions: { x: number; y: number; z: number }[], a
 
         if (placeablePositions.length < 2) return null; // Stuck
 
-        // Pick BOTH positions randomly for natural distribution
-        const idx1 = Math.floor(Math.random() * placeablePositions.length);
-        const pos1 = placeablePositions[idx1];
-        placeablePositions.splice(idx1, 1);
+        // Try to find two positions with minimum distance
+        let found = false;
+        let pos1: { x: number; y: number; z: number } | null = null;
+        let pos2: { x: number; y: number; z: number } | null = null;
 
-        const idx2 = Math.floor(Math.random() * placeablePositions.length);
-        const pos2 = placeablePositions[idx2];
+        // Try up to 20 random attempts to find well-separated pair
+        for (let attempt = 0; attempt < 20 && !found; attempt++) {
+            const idx1 = Math.floor(Math.random() * placeablePositions.length);
+            const candidatePos1 = placeablePositions[idx1];
+
+            // Find positions far enough from pos1
+            const farPositions = placeablePositions.filter((p, i) =>
+                i !== idx1 && getDistance(candidatePos1, p) >= MIN_DISTANCE
+            );
+
+            if (farPositions.length > 0) {
+                const idx2 = Math.floor(Math.random() * farPositions.length);
+                pos1 = candidatePos1;
+                pos2 = farPositions[idx2];
+                found = true;
+            }
+        }
+
+        // Fallback: if can't find minimum distance, just pick randomly
+        if (!found) {
+            const idx1 = Math.floor(Math.random() * placeablePositions.length);
+            pos1 = placeablePositions[idx1];
+            const remaining = placeablePositions.filter((_, i) => i !== idx1);
+            pos2 = remaining[Math.floor(Math.random() * remaining.length)];
+        }
+
+        if (!pos1 || !pos2) return null;
 
         finalTiles.push({ id: generateTileId(), typeId: type1.id, ...pos1, isRemoved: false });
         finalTiles.push({ id: generateTileId(), typeId: type2.id, ...pos2, isRemoved: false });
@@ -211,6 +246,7 @@ function assignSolvableTypes(positions: { x: number; y: number; z: number }[], a
 
     return finalTiles;
 }
+
 
 
 // Greedy verification removed as it rejected non-greedily solvable boards
@@ -268,7 +304,7 @@ export function generateBoard(layout: Layout): GameBoard {
 }
 
 /**
- * Shuffle remaining tiles on the board - uses simple random redistribution
+ * Shuffle remaining tiles on the board - uses solvable algorithm with min distance
  */
 export function shuffleBoard(board: GameBoard): GameBoard {
     const activeTiles = board.tiles.filter(t => !t.isRemoved);
@@ -277,14 +313,24 @@ export function shuffleBoard(board: GameBoard): GameBoard {
     const positions = activeTiles.map(t => ({ x: t.x, y: t.y, z: t.z }));
     const types = activeTiles.map(t => getTileTypeById(t.typeId)).filter(Boolean) as TileType[];
 
-    // Shuffle types array
+    // Try to use the solvable algorithm with minimum distance
+    for (let attempt = 0; attempt < 20; attempt++) {
+        const newActiveTiles = assignSolvableTypes(positions, types);
+        if (newActiveTiles) {
+            return {
+                ...board,
+                tiles: [...newActiveTiles, ...removedTiles],
+            };
+        }
+    }
+
+    // Fallback: simple random shuffle (still works, just may have adjacent matches)
     for (let i = types.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [types[i], types[j]] = [types[j], types[i]];
     }
 
-    // Simply reassign types to positions randomly
-    const newActiveTiles: TileInstance[] = positions.map((pos, i) => ({
+    const fallbackTiles: TileInstance[] = positions.map((pos, i) => ({
         id: generateTileId(),
         typeId: types[i].id,
         ...pos,
@@ -293,9 +339,10 @@ export function shuffleBoard(board: GameBoard): GameBoard {
 
     return {
         ...board,
-        tiles: [...newActiveTiles, ...removedTiles],
+        tiles: [...fallbackTiles, ...removedTiles],
     };
 }
+
 
 
 /**
