@@ -46,7 +46,7 @@ function App() {
   // Auto-switch to mobile layout on first load if on mobile
   useEffect(() => {
     if (isMobile && !initialLayoutSet) {
-      newGame('flat'); // Use simple flat layout for mobile - proven to work
+      newGame('tower'); // Imperial Tower - 6 tiles wide, portrait-optimized
       setInitialLayoutSet(true);
     }
   }, [isMobile, initialLayoutSet, newGame]);
@@ -264,9 +264,10 @@ function App() {
             <h2 className="text-xl font-bold mb-4 text-center">Select Layout</h2>
             <div className="space-y-2">
               {[
-                { id: 'turtle', name: 'Turtle (Classic)' },
+                { id: 'tower', name: 'Imperial Tower (Mobile)' },
                 { id: 'flat', name: 'Flat (Mobile)' },
                 { id: 'simple', name: 'Simple' },
+                { id: 'turtle', name: 'Turtle (Classic)' },
                 { id: 'large', name: 'Large (Easy View)' },
                 { id: 'pyramid', name: 'Pyramid' },
                 { id: 'dragon', name: 'Dragon' },
@@ -277,6 +278,7 @@ function App() {
                 { id: 'diamond', name: 'Diamond' },
                 { id: 'temple', name: 'Temple' },
                 { id: 'scatter', name: 'Scatter' },
+
 
               ].map(layout => (
                 <button
