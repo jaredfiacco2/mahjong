@@ -10,10 +10,12 @@ export const useMobile = () => {
         const checkDevice = () => {
             const width = window.innerWidth;
             const height = window.innerHeight;
+            const ua = navigator.userAgent;
+            const isUAWorkaround = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 
             // Refined breakpoints for luxury devices
-            setIsMobile(width < 768 || (width < 1024 && height < 500)); // Include small landscape phones
-            setIsTablet(width >= 768 && width < 1024 && height >= 500);
+            setIsMobile(width < 768 || (width < 1024 && height < 500) || isUAWorkaround); // Include small landscape phones
+            setIsTablet(width >= 768 && width < 1024 && height >= 500 && !isUAWorkaround);
             setIsLandscape(width > height);
             setTouchPoints(navigator.maxTouchPoints || 0);
         };

@@ -125,7 +125,7 @@ export const Controls: React.FC<ControlsProps> = ({
     elapsedTime,
     isComplete,
     isStuck,
-    score: _score, // Available for future use
+    score: _score, // Reserved for future use
 }) => {
     const [showLayoutMenu, setShowLayoutMenu] = useState(false);
     const [isMuted, setIsMuted] = useState(soundManager.isMuted());
@@ -232,40 +232,57 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     {showLayoutMenu && (
                         <>
-                            {/* Backdrop */}
+                            {/* Backdrop - Cinematic Fade */}
                             <div
-                                className="fixed inset-0 z-40"
+                                className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
                                 onClick={() => setShowLayoutMenu(false)}
                             />
 
-                            {/* Menu */}
-                            <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 p-2 rounded-2xl z-50 min-w-[200px] max-h-[60vh] overflow-y-auto"
+                            {/* Menu - Responsive Logic (Bottom-sheet on mobile, Pop-over on desktop) */}
+                            <div className="layout-drawer fixed bottom-0 left-0 right-0 sm:absolute sm:bottom-full sm:mb-3 sm:left-1/2 sm:-translate-x-1/2 p-4 sm:p-2 rounded-t-[32px] sm:rounded-2xl z-50 min-w-[200px] max-h-[80vh] overflow-y-auto animate-in slide-in-from-bottom duration-400 cubic-bezier(0.2, 0.8, 0.2, 1)"
                                 style={{
                                     background: 'var(--color-bg-secondary)',
                                     border: '1px solid rgba(197, 160, 89, 0.3)',
-                                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.6)',
+                                    boxShadow: '0 -15px 40px rgba(0, 0, 0, 0.5)',
                                 }}>
-                                <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider px-3 py-2 font-medium">
-                                    Select Layout
-                                </div>
-                                {LAYOUTS.map(layout => (
+                                <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 mb-2">
+                                    <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest font-bold">
+                                        Imperial Layouts
+                                    </div>
                                     <button
-                                        key={layout.id}
-                                        className={`w-full px-4 py-3 text-left rounded-xl transition-all duration-200 flex items-center justify-between ${layout.id === currentLayout.id
-                                            ? 'bg-[var(--color-accent-blue)] text-white shadow-lg'
-                                            : 'hover:bg-white/5 active:bg-white/10'
-                                            }`}
-                                        onClick={() => {
-                                            onNewGame(layout.id);
-                                            setShowLayoutMenu(false);
-                                        }}
+                                        className="sm:hidden text-[var(--color-imperial-gold)] text-sm font-bold"
+                                        onClick={() => setShowLayoutMenu(false)}
                                     >
-                                        <span className="font-medium">{layout.name}</span>
-                                        {layout.id === currentLayout.id && (
-                                            <span className="ml-2">{Icons.check}</span>
-                                        )}
+                                        Done
                                     </button>
-                                ))}
+                                </div>
+                                <div className="grid grid-cols-1 gap-1">
+                                    {LAYOUTS.map(layout => (
+                                        <button
+                                            key={layout.id}
+                                            className={`w-full px-4 py-4 sm:py-3 text-left rounded-xl transition-all duration-300 flex items-center justify-between group ${layout.id === currentLayout.id
+                                                ? 'bg-[var(--color-imperial-gold)] text-black font-bold shadow-lg'
+                                                : 'hover:bg-white/5 active:bg-white/10 text-[var(--color-text-primary)]'
+                                                }`}
+                                            onClick={() => {
+                                                if (window.navigator?.vibrate) window.navigator.vibrate(5);
+                                                onNewGame(layout.id);
+                                                setShowLayoutMenu(false);
+                                            }}
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="text-base sm:text-sm">{layout.name}</span>
+                                            </div>
+                                            {layout.id === currentLayout.id ? (
+                                                <span className="opacity-80 scale-110">{Icons.check}</span>
+                                            ) : (
+                                                <span className="opacity-0 group-hover:opacity-40 transition-opacity">{Icons.check}</span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                                {/* Bottom safe area spacer for mobile */}
+                                <div className="h-safe sm:hidden" />
                             </div>
                         </>
                     )}

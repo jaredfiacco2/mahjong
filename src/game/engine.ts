@@ -158,75 +158,83 @@ function isPositionAvailable(
 
 /**
  * Helper to assign tile types to positions solvably via reverse simulation.
- * Key insight: We place PAIRS of matching tiles in positions that are both "free"
- * at the time of placement, working backwards from an empty board.
+ * Returns null if it gets stuck (layout prevents full assignment).
  */
-function assignSolvableTypes(positions: { x: number; y: number; z: number }[], availableTypes: TileType[]): TileInstance[] {
+function assignSolvableTypes(positions: { x: number; y: number; z: number }[], availableTypes: TileType[]): TileInstance[] | null {
     const occupiedPositions: { x: number; y: number; z: number }[] = [];
     const availablePositions = [...positions];
     const finalTiles: TileInstance[] = [];
 
     // Build pairs of matching types
-    // Group tiles by their matchGroup or id for matching
     const typeGroups = new Map<string, TileType[]>();
     for (const t of availableTypes) {
         const key = t.matchGroup || t.id;
-        if (!typeGroups.has(key)) {
-            typeGroups.set(key, []);
-        }
+        if (!typeGroups.has(key)) typeGroups.set(key, []);
         typeGroups.get(key)!.push(t);
     }
 
-    // Create actual pairs (each pair = 2 tiles that match)
     const matchingPairs: [TileType, TileType][] = [];
     for (const [_key, group] of typeGroups) {
-        // Take tiles in pairs
         while (group.length >= 2) {
-            const t1 = group.pop()!;
-            const t2 = group.pop()!;
-            matchingPairs.push([t1, t2]);
+            matchingPairs.push([group.pop()!, group.pop()!]);
         }
     }
 
-    // Shuffle the pairs
+    // Shuffle pair placement order
     for (let i = matchingPairs.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [matchingPairs[i], matchingPairs[j]] = [matchingPairs[j], matchingPairs[i]];
     }
 
-    // Place each pair at positions that are both currently "free"
     for (const [type1, type2] of matchingPairs) {
         const placeablePositions = availablePositions.filter(pos =>
             isPositionAvailable(pos, occupiedPositions)
         );
 
-        if (placeablePositions.length >= 2) {
-            // Pick two random free positions
-            const idx1 = Math.floor(Math.random() * placeablePositions.length);
-            const pos1 = placeablePositions[idx1];
-            placeablePositions.splice(idx1, 1);
+        if (placeablePositions.length < 2) return null; // Stuck
 
-            const idx2 = Math.floor(Math.random() * placeablePositions.length);
-            const pos2 = placeablePositions[idx2];
+        const idx1 = Math.floor(Math.random() * placeablePositions.length);
+        const pos1 = placeablePositions[idx1];
+        placeablePositions.splice(idx1, 1);
 
-            // Assign the MATCHING pair to these positions
-            finalTiles.push({ id: generateTileId(), typeId: type1.id, ...pos1, isRemoved: false });
-            finalTiles.push({ id: generateTileId(), typeId: type2.id, ...pos2, isRemoved: false });
+        const idx2 = Math.floor(Math.random() * placeablePositions.length);
+        const pos2 = placeablePositions[idx2];
 
-            occupiedPositions.push(pos1, pos2);
-            availablePositions.splice(availablePositions.indexOf(pos1), 1);
-            availablePositions.splice(availablePositions.indexOf(pos2), 1);
-        } else if (availablePositions.length >= 2) {
-            // Fallback: take any two remaining positions
-            const pos1 = availablePositions.pop()!;
-            const pos2 = availablePositions.pop()!;
-            finalTiles.push({ id: generateTileId(), typeId: type1.id, ...pos1, isRemoved: false });
-            finalTiles.push({ id: generateTileId(), typeId: type2.id, ...pos2, isRemoved: false });
-            occupiedPositions.push(pos1, pos2);
-        }
+        finalTiles.push({ id: generateTileId(), typeId: type1.id, ...pos1, isRemoved: false });
+        finalTiles.push({ id: generateTileId(), typeId: type2.id, ...pos2, isRemoved: false });
+
+        occupiedPositions.push(pos1, pos2);
+        availablePositions.splice(availablePositions.indexOf(pos1), 1);
+        availablePositions.splice(availablePositions.indexOf(pos2), 1);
     }
 
     return finalTiles;
+}
+
+/**
+ * Greedily verify that a board is solvable all the way to the end.
+ * Since the generator uses reverse-simulation, if a greedy path exists, 
+ * the board is definitely solvable.
+ */
+function verifySolvability(tiles: TileInstance[]): boolean {
+    const simulationTiles = tiles.map(t => ({ ...t }));
+    let matchesMade = 0;
+    const totalPairs = simulationTiles.length / 2;
+
+    while (true) {
+        const matches = findAllMatches(simulationTiles);
+        if (matches.length === 0) break;
+
+        // Take a match and continue
+        const [t1, t2] = matches[0];
+        const t1Ref = simulationTiles.find(t => t.id === t1.id);
+        const t2Ref = simulationTiles.find(t => t.id === t2.id);
+        if (t1Ref) t1Ref.isRemoved = true;
+        if (t2Ref) t2Ref.isRemoved = true;
+        matchesMade++;
+    }
+
+    return matchesMade === totalPairs;
 }
 
 /**
@@ -260,8 +268,19 @@ export function generateBoard(layout: Layout): GameBoard {
         }
     }
 
-    const tiles = assignSolvableTypes(layout.positions, tilePairs);
-    return { tiles, layout };
+    let attempts = 0;
+    while (attempts < 50) {
+        attempts++;
+        const tiles = assignSolvableTypes(layout.positions, tilePairs);
+        if (tiles && verifySolvability(tiles)) {
+            return { tiles, layout };
+        }
+    }
+
+    // High-alert fallback: should not be hit on standard layouts
+    console.error("Failed to generate solvable board in 50 attempts");
+    const basicTiles = assignSolvableTypes(layout.positions, tilePairs) || [];
+    return { tiles: basicTiles, layout };
 }
 
 /**
@@ -274,11 +293,22 @@ export function shuffleBoard(board: GameBoard): GameBoard {
     const positions = activeTiles.map(t => ({ x: t.x, y: t.y, z: t.z }));
     const types = activeTiles.map(t => getTileTypeById(t.typeId)).filter(Boolean) as TileType[];
 
-    const newActiveTiles = assignSolvableTypes(positions, types);
+    let attempts = 0;
+    while (attempts < 50) {
+        attempts++;
+        const newActiveTiles = assignSolvableTypes(positions, types);
+        if (newActiveTiles && verifySolvability([...newActiveTiles, ...removedTiles])) {
+            return {
+                ...board,
+                tiles: [...newActiveTiles, ...removedTiles],
+            };
+        }
+    }
 
+    const basicTiles = assignSolvableTypes(positions, types) || [];
     return {
         ...board,
-        tiles: [...newActiveTiles, ...removedTiles],
+        tiles: [...basicTiles, ...removedTiles],
     };
 }
 

@@ -1,7 +1,7 @@
-// Game board component - renders all tiles with auto-scaling and match animations
 import React, { useMemo, useEffect, useState, useRef, useCallback } from 'react';
 import type { TileInstance } from '../game/tiles';
 import Tile from './Tile';
+import { useMobile } from '../hooks/useMobile';
 
 interface BoardProps {
     tiles: TileInstance[];
@@ -20,6 +20,7 @@ export const Board: React.FC<BoardProps> = ({
     onTileClick,
     userZoom = 1,
 }) => {
+    const { isMobile, isTablet } = useMobile();
     const containerRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
     const [matchingTiles, _setMatchingTiles] = useState<Set<string>>(new Set());
@@ -53,23 +54,27 @@ export const Board: React.FC<BoardProps> = ({
             return { width: 0, height: 0, offsetX: 0, offsetY: 0, baseWidth: 0, baseHeight: 0 };
         }
 
+        // Match these constants precisely with index.css media queries
+        const tileW = isMobile ? 32 : (isTablet ? 38 : 46);
+        const tileH = isMobile ? 44 : (isTablet ? 52 : 62);
+
         const minX = Math.min(...activeTiles.map(t => t.x));
         const maxX = Math.max(...activeTiles.map(t => t.x));
         const minY = Math.min(...activeTiles.map(t => t.y));
         const maxY = Math.max(...activeTiles.map(t => t.y));
 
-        const bWidth = (maxX - minX + 1) * 46 + 60; // tile width + spacing + padding
-        const bHeight = (maxY - minY + 1) * 62 + 80; // tile height + spacing + padding
+        const bWidth = (maxX - minX + 1) * tileW + (isMobile ? 40 : 60);
+        const bHeight = (maxY - minY + 1) * tileH + (isMobile ? 60 : 80);
 
         return {
             width: bWidth,
             height: bHeight,
-            offsetX: -minX * 46 + 20,
-            offsetY: -minY * 62 + 20,
+            offsetX: -minX * tileW + 20,
+            offsetY: -minY * tileH + 20,
             baseWidth: bWidth,
             baseHeight: bHeight,
         };
-    }, [tiles]);
+    }, [tiles, isMobile, isTablet]);
 
     // Auto-scale the board to fit the viewport
     const updateScale = useCallback(() => {

@@ -586,6 +586,135 @@ function generateFlatPositions(): LayoutPosition[] {
     return positions.slice(0, 144);
 }
 
+// Imperial Tower layout - portrait-optimized for luxury mobile devices
+const imperialTowerLayout: Layout = {
+    id: 'tower',
+    name: 'Imperial Tower (Mobile)',
+    description: 'A tall, stately tower optimized for mobile portrait view',
+    positions: generateTowerPositions(),
+};
+
+function generateTowerPositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+
+    // Base Layer 0 - 6x12 rectangle (72 tiles)
+    for (let y = 0; y < 12; y++) {
+        for (let x = 0; x < 6; x++) {
+            positions.push({ x: x + 6, y, z: 0 });
+        }
+    }
+
+    // Layer 1 - 4x10 centered (40 tiles)
+    for (let y = 1; y < 11; y++) {
+        for (let x = 1; x < 5; x++) {
+            positions.push({ x: x + 6, y, z: 1 });
+        }
+    }
+
+    // Layer 2 - 4x6 centered (24 tiles)
+    for (let y = 3; y < 9; y++) {
+        for (let x = 1; x < 5; x++) {
+            positions.push({ x: x + 6, y, z: 2 });
+        }
+    }
+
+    // Layer 3 - 2x4 centered (8 tiles)
+    for (let y = 4; y < 8; y++) {
+        for (let x = 2; x < 4; x++) {
+            positions.push({ x: x + 6, y, z: 3 });
+        }
+    }
+
+    return positions.slice(0, 144);
+}
+
+// Imperial Monolith - The ultimate mobile portrait layout
+// 4 tiles wide for maximum touch accuracy and vertical fit
+const monolithLayout: Layout = {
+    id: 'monolith',
+    name: 'Imperial Monolith',
+    description: 'Perfect 4-wide vertical tower for mobile portrait play',
+    positions: generateMonolithPositions(),
+};
+
+function generateMonolithPositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+
+    // Layer 0 - 4x14 base (56 tiles)
+    for (let y = 0; y < 14; y++) {
+        for (let x = 0; x < 4; x++) {
+            positions.push({ x: x + 7, y: y + 1, z: 0 });
+        }
+    }
+
+    // Layer 1 - 4x10 centered (40 tiles)
+    for (let y = 2; y < 12; y++) {
+        for (let x = 0; x < 4; x++) {
+            positions.push({ x: x + 7, y: y + 1, z: 1 });
+        }
+    }
+
+    // Layer 2 - 4x8 centered (32 tiles)
+    for (let y = 3; y < 11; y++) {
+        for (let x = 0; x < 4; x++) {
+            positions.push({ x: x + 7, y: y + 1, z: 2 });
+        }
+    }
+
+    // Layer 3 - 4x4 top (16 tiles)
+    for (let y = 5; y < 9; y++) {
+        for (let x = 0; x < 4; x++) {
+            positions.push({ x: x + 7, y: y + 1, z: 3 });
+        }
+    }
+
+    return positions.slice(0, 144);
+}
+
+// Zen Pillar - High-spaced mobile layout for relaxed play
+const zenPillarLayout: Layout = {
+    id: 'pillar',
+    name: 'Zen Pillar',
+    description: 'Low-density, highly-spaced 4-wide layout',
+    positions: generatePillarPositions(),
+};
+
+function generatePillarPositions(): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+
+    // Spaced vertical bars
+    for (let y = 0; y < 16; y++) {
+        if (y % 2 === 0) {
+            positions.push({ x: 7, y, z: 0 });
+            positions.push({ x: 10, y, z: 0 });
+        } else {
+            positions.push({ x: 8, y, z: 0 });
+            positions.push({ x: 9, y, z: 0 });
+        }
+    }
+
+    // Center tower
+    for (let y = 2; y < 14; y++) {
+        for (let x = 0; x < 4; x++) {
+            positions.push({ x: x + 7, y, z: 1 });
+        }
+    }
+
+    // Cap
+    for (let y = 4; y < 12; y++) {
+        for (let x = 1; x < 3; x++) {
+            positions.push({ x: x + 7.5, y, z: 2 });
+        }
+    }
+
+    // Final fill to 144
+    while (positions.length < 144) {
+        positions.push({ x: 8.5, y: positions.length % 16, z: 3 });
+    }
+
+    return positions.slice(0, 144);
+}
+
 // Simple layout - mobile-friendly, only 2 layers
 const simpleLayout: Layout = {
     id: 'simple',
@@ -672,7 +801,10 @@ function generateLargePositions(): LayoutPosition[] {
 
 // All available layouts
 export const LAYOUTS: Layout[] = [
+    monolithLayout,
+    zenPillarLayout,
     turtleLayout,
+    imperialTowerLayout,
     largeLayout,
     flatLayout,
     simpleLayout,

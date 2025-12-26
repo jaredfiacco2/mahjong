@@ -1,7 +1,7 @@
-// Individual Mahjong tile component with 3D styling and animations
 import React, { useState, useEffect, useRef } from 'react';
 import type { TileInstance } from '../game/tiles';
 import { getTileTypeById, getTileCategoryColor } from '../game/tiles';
+import { useMobile } from '../hooks/useMobile';
 
 interface TileProps {
     tile: TileInstance;
@@ -66,6 +66,8 @@ export const Tile: React.FC<TileProps> = ({
         }
     }, [isSelected]);
 
+    const { isMobile, isTablet } = useMobile();
+
     if (!tileType || tile.isRemoved) return null;
 
     const categoryColor = getTileCategoryColor(tileType.category);
@@ -76,14 +78,18 @@ export const Tile: React.FC<TileProps> = ({
     const blockedClass = !isFree ? 'tile-blocked' : '';
     const matchingClass = isMatching ? 'tile-matched' : '';
 
+    // Device-specific positioning (must match index.css and Board.tsx)
+    const tileW = isMobile ? 32 : (isTablet ? 38 : 46);
+    const tileH = isMobile ? 44 : (isTablet ? 52 : 62);
+
     return (
         <div
             ref={tileRef}
             className={`mahjong-tile ${layerClass} ${selectedClass} ${hintClass} ${blockedClass} ${matchingClass}`}
             style={{
                 position: 'absolute',
-                left: `${tile.x * 46}px`,
-                top: `${tile.y * 62}px`,
+                left: `${tile.x * tileW}px`,
+                top: `${tile.y * tileH}px`,
                 zIndex: tile.z * 100 + Math.floor(tile.y * 10),
             }}
             onClick={isFree && !isMatching ? onClick : undefined}

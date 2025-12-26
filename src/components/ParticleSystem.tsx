@@ -136,12 +136,19 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ trigger, onCompl
             style={{ width: '100%', height: '100%' }}
         >
             <defs>
-                <filter id="boutiqueGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                    </feMerge>
+                <filter id="boutiqueGlow" x="-100%" y="-100%" width="300%" height="300%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feColorMatrix in="blur" type="matrix" values="
+                        1 0 0 0 0
+                        0 1 0 0 0
+                        0 0 1 0 0
+                        0 0 0 18 -7
+                    " result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+                <filter id="successBloom">
+                    <feGaussianBlur stdDeviation="8" result="blur" />
+                    <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" />
                 </filter>
             </defs>
 
