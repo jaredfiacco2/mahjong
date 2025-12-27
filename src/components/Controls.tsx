@@ -147,8 +147,8 @@ export const Controls: React.FC<ControlsProps> = ({
 
     return (
         <div className="controls-wrapper w-full">
-            {/* Top HUD with Progress */}
-            <div className="stats-bar fixed top-0 left-0 right-0 z-50 pt-safe">
+            {/* Top HUD with Progress - high z-index to stay above tiles */}
+            <div className="stats-bar fixed top-0 left-0 right-0 z-[1000] pt-safe pointer-events-none">
                 {/* Progress bar at very top - Ultra thin, Apple style */}
                 <div className="progress-bar" style={{ borderRadius: 0, height: '2.5px', background: 'rgba(255,255,255,0.05)' }}>
                     <div

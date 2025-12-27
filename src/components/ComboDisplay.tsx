@@ -32,12 +32,6 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
         }
     }, [lastMatchPoints]);
 
-    const getComboColor = () => {
-        if (combo >= 5) return 'linear-gradient(135deg, #c5a059 0%, #d4af37 50%, #fff 100%)';
-        if (combo >= 3) return 'linear-gradient(135deg, #c5a059 0%, #ffd700 100%)';
-        return 'var(--color-royal-gold)';
-    };
-
     const getComboText = () => {
         if (combo >= 10) return 'MAJESTIC';
         if (combo >= 7) return 'UNSTOPPABLE';
@@ -48,8 +42,8 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
 
     return (
         <>
-            {/* Prestige Score display - non-interactive overlay */}
-            <div className="fixed top-12 right-6 z-40 text-right pointer-events-none">
+            {/* Prestige Score display - hidden on narrow screens to prevent tile overlap */}
+            <div className="hidden md:block fixed top-12 right-6 z-40 text-right pointer-events-none">
                 <div className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold mb-1">BOUTIQUE SCORE</div>
                 <div
                     className="text-4xl font-black italic tracking-tighter tabular-nums"
@@ -64,10 +58,10 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
                     {score.toLocaleString()}
                 </div>
 
-                {/* Floating points */}
+                {/* Floating points - must not block clicks */}
                 {showPoints && lastMatchPoints && (
                     <div
-                        className="absolute right-0 text-xl font-bold italic"
+                        className="absolute right-0 text-xl font-bold italic pointer-events-none"
                         style={{
                             color: '#c5a059',
                             animation: 'floatUpGold 1.2s cubic-bezier(0.2, 0, 0.2, 1) forwards',
@@ -80,27 +74,24 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo, score, lastMa
             </div>
 
 
-            {/* Prestige Combo display */}
+            {/* Prestige Combo display - positioned over stats area, not blocking game */}
             {displayCombo >= 2 && (
                 <div
-                    className="fixed top-1/4 left-1/2 -translate-x-1/2 z-50 text-center pointer-events-none"
+                    className="fixed top-24 left-1/2 -translate-x-1/2 z-50 text-center pointer-events-none"
                     style={{ animation: 'comboPrestigeAppear 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
                 >
                     <div
-                        className={`text-8xl font-black italic tracking-tighter shimmer-gold`}
+                        className="text-6xl font-black italic tracking-tighter pointer-events-none"
                         style={{
-                            background: getComboColor(),
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
+                            color: '#c5a059',  /* Solid gold - always visible */
                             transform: `scale(${comboScale})`,
                             transition: 'transform 0.2s cubic-bezier(0.2, 1, 0.2, 1)',
-                            filter: 'drop-shadow(0 10px 30px rgba(197, 160, 89, 0.6))',
+                            textShadow: '0 4px 20px rgba(197, 160, 89, 0.8), 0 0 40px rgba(197, 160, 89, 0.4)',
                         }}
                     >
                         {combo}x
                     </div>
-                    <div className="text-sm font-bold tracking-[0.5em] text-white/60 uppercase mt-[-10px]">
+                    <div className="text-xs font-bold tracking-[0.3em] text-white/70 uppercase mt-1 pointer-events-none">
                         {getComboText()}
                     </div>
                 </div>

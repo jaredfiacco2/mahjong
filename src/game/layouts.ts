@@ -724,58 +724,25 @@ const mobilePyramidLayout: Layout = {
 function generateMobilePyramidPositions(): LayoutPosition[] {
     const positions: LayoutPosition[] = [];
 
-    // MOBILE PYRAMID: 72 tiles (fewer but bigger), 4 layers, proper inset stacking
-    // Base is 6 wide x 6 tall = 36 tiles
-    // Each layer insets by 1 tile on each side
+    // MOBILE PYRAMID: 72 tiles with 12 ROWS for better pair distribution
+    // More rows = algorithm can place pairs on different rows more easily
 
-    // Layer 0 (base) - 6x6 = 36 tiles
-    for (let y = 0; y < 6; y++) {
+    // Layer 0 (base) - 6 tiles wide x 10 rows = 60 tiles
+    for (let y = 0; y < 10; y++) {
         for (let x = 0; x < 6; x++) {
             positions.push({ x, y, z: 0 });
         }
     }
 
-    // Layer 1 - 4x4 = 16 tiles (inset by 1)
-    for (let y = 1; y < 5; y++) {
-        for (let x = 1; x < 5; x++) {
-            positions.push({ x, y, z: 1 });
-        }
+    // Layer 1 - 4 tiles wide x 8 rows = 32 tiles (centered, inset by 1)
+    // But we only need 12 more tiles to reach 72
+    // So: 6 tiles on y=1,2,3,4,5,6 (2 per row)
+    for (let y = 2; y < 8; y++) {
+        positions.push({ x: 2, y, z: 1 });
+        positions.push({ x: 3, y, z: 1 });
     }
 
-    // Layer 2 - 2x2 = 4 tiles (inset by 2)
-    for (let y = 2; y < 4; y++) {
-        for (let x = 2; x < 4; x++) {
-            positions.push({ x, y, z: 2 });
-        }
-    }
-
-    // Now we have 56 tiles. Add wings to reach 72
-    // Left wing
-    positions.push({ x: -1, y: 2, z: 0 });
-    positions.push({ x: -1, y: 3, z: 0 });
-    // Right wing
-    positions.push({ x: 6, y: 2, z: 0 });
-    positions.push({ x: 6, y: 3, z: 0 });
-    // Top extension
-    positions.push({ x: 2, y: -1, z: 0 });
-    positions.push({ x: 3, y: -1, z: 0 });
-    // Bottom extension
-    positions.push({ x: 2, y: 6, z: 0 });
-    positions.push({ x: 3, y: 6, z: 0 });
-
-    // Add more layer 1 tiles at corners
-    positions.push({ x: 0, y: 0, z: 1 });
-    positions.push({ x: 5, y: 0, z: 1 });
-    positions.push({ x: 0, y: 5, z: 1 });
-    positions.push({ x: 5, y: 5, z: 1 });
-
-    // Top crown - 4 tiles on layer 3
-    positions.push({ x: 2, y: 2, z: 3 });
-    positions.push({ x: 3, y: 2, z: 3 });
-    positions.push({ x: 2, y: 3, z: 3 });
-    positions.push({ x: 3, y: 3, z: 3 });
-
-    return positions.slice(0, 72); // 72 tiles for mobile - bigger display
+    return positions.slice(0, 72); // 72 tiles for mobile
 }
 
 

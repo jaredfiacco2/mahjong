@@ -78,9 +78,9 @@ export const Tile: React.FC<TileProps> = ({
     const blockedClass = !isFree ? 'tile-blocked' : '';
     const matchingClass = isMatching ? 'tile-matched' : '';
 
-    // Device-specific positioning (must match index.css and Board.tsx)
-    const tileW = isMobile ? 32 : (isTablet ? 38 : 46);
-    const tileH = isMobile ? 44 : (isTablet ? 52 : 62);
+    // Device-specific positioning - slightly larger than tile size for gaps
+    const tileW = isMobile ? 34 : (isTablet ? 42 : 50);  // +gap
+    const tileH = isMobile ? 48 : (isTablet ? 58 : 68);  // +gap
 
     return (
         <div
@@ -90,8 +90,11 @@ export const Tile: React.FC<TileProps> = ({
                 position: 'absolute',
                 left: `${tile.x * tileW}px`,
                 top: `${tile.y * tileH}px`,
-                zIndex: tile.z * 100 + Math.floor(tile.y * 10),
+                // Z-index: higher Z layers on top, and for same Z, LOWER Y (top rows) should be HIGHER z-index
+                // so shadows from bottom rows don't cover top row tiles
+                zIndex: tile.z * 100 + (100 - Math.floor(tile.y * 10)),
             }}
+
             onClick={isFree && !isMatching ? onClick : undefined}
             role="button"
             tabIndex={isFree ? 0 : -1}

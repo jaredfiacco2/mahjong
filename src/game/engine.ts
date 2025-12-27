@@ -5,6 +5,8 @@ import type { TileInstance, TileType } from './tiles';
 import { STANDARD_TILES, ALL_TILE_TYPES, tilesMatch, getTileTypeById } from './tiles';
 import type { Layout } from './layouts';
 
+import { LAYOUTS } from './layouts';
+
 export interface GameBoard {
     tiles: TileInstance[];
     layout: Layout;
@@ -186,17 +188,6 @@ function assignSolvableTypes(positions: { x: number; y: number; z: number }[], a
         [matchingPairs[i], matchingPairs[j]] = [matchingPairs[j], matchingPairs[i]];
     }
 
-    // Helper: calculate distance between positions (weight Y more to avoid same-row)
-    const getDistance = (p1: { x: number; y: number; z: number }, p2: { x: number; y: number; z: number }) => {
-        const dx = p1.x - p2.x;
-        const dy = (p1.y - p2.y) * 1.5; // Weight Y distance more - prevents same-row matches
-        return Math.sqrt(dx * dx + dy * dy);
-    };
-
-    // Minimum distance for matching pairs - prevents adjacent AND same-row matches
-    const MIN_DISTANCE = 4.0;
-
-
     for (const [type1, type2] of matchingPairs) {
         const placeablePositions = availablePositions.filter(pos =>
             isPositionAvailable(pos, occupiedPositions)
@@ -204,38 +195,41 @@ function assignSolvableTypes(positions: { x: number; y: number; z: number }[], a
 
         if (placeablePositions.length < 2) return null; // Stuck
 
-        // Try to find two positions with minimum distance
+        // STRICT: Pick first position, then pick second on a DIFFERENT ROW
+        // Try many combinations to find valid placement
         let found = false;
         let pos1: { x: number; y: number; z: number } | null = null;
         let pos2: { x: number; y: number; z: number } | null = null;
 
-        // Try up to 20 random attempts to find well-separated pair
-        for (let attempt = 0; attempt < 20 && !found; attempt++) {
-            const idx1 = Math.floor(Math.random() * placeablePositions.length);
-            const candidatePos1 = placeablePositions[idx1];
+        // Shuffle placeable positions for randomness
+        const shuffled = [...placeablePositions];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
 
-            // Find positions far enough from pos1
-            const farPositions = placeablePositions.filter((p, i) =>
-                i !== idx1 && getDistance(candidatePos1, p) >= MIN_DISTANCE
+        // Find first position that has a valid partner SEPARATED (different row OR different Z)
+        for (const candidate1 of shuffled) {
+            // Find positions that are separated:
+            // - Different row (Y differs by at least 1) OR
+            // - Different layer (Z differs by at least 1)
+            const separatedPositions = shuffled.filter(p =>
+                p !== candidate1 && (Math.abs(p.y - candidate1.y) >= 1 || Math.abs(p.z - candidate1.z) >= 1)
             );
 
-            if (farPositions.length > 0) {
-                const idx2 = Math.floor(Math.random() * farPositions.length);
-                pos1 = candidatePos1;
-                pos2 = farPositions[idx2];
+            if (separatedPositions.length > 0) {
+                // Pick a random one from separated positions
+                pos1 = candidate1;
+                pos2 = separatedPositions[Math.floor(Math.random() * separatedPositions.length)];
                 found = true;
+                break;
             }
         }
 
-        // Fallback: if can't find minimum distance, just pick randomly
-        if (!found) {
-            const idx1 = Math.floor(Math.random() * placeablePositions.length);
-            pos1 = placeablePositions[idx1];
-            const remaining = placeablePositions.filter((_, i) => i !== idx1);
-            pos2 = remaining[Math.floor(Math.random() * remaining.length)];
-        }
 
-        if (!pos1 || !pos2) return null;
+        // If we couldn't find different-row positions, this layout is too constrained
+        // Return null so caller can retry with fresh shuffle
+        if (!found || !pos1 || !pos2) return null;
 
         finalTiles.push({ id: generateTileId(), typeId: type1.id, ...pos1, isRemoved: false });
         finalTiles.push({ id: generateTileId(), typeId: type2.id, ...pos2, isRemoved: false });
@@ -250,13 +244,18 @@ function assignSolvableTypes(positions: { x: number; y: number; z: number }[], a
 
 
 
+
 // Greedy verification removed as it rejected non-greedily solvable boards
 // The reverse-simulation itself provides the winnability guarantee.
 
 /**
  * Generate a solvable board
  */
-export function generateBoard(layout: Layout): GameBoard {
+export function generateBoard(layoutId?: string): GameBoard {
+    const layout = layoutId
+        ? LAYOUTS.find(l => l.id === layoutId) || LAYOUTS[0]
+        : LAYOUTS[0];
+
     resetTileIdCounter();
 
     const posCount = layout.positions.length;
@@ -284,25 +283,87 @@ export function generateBoard(layout: Layout): GameBoard {
         }
     }
 
-    let attempts = 0;
-    while (attempts < 50) {
-        attempts++;
-        const tiles = assignSolvableTypes(layout.positions, tilePairs);
-        if (tiles) {
-            return { tiles, layout };
-        }
+    // Shuffle tile types
+    for (let i = tilePairs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tilePairs[i], tilePairs[j]] = [tilePairs[j], tilePairs[i]];
     }
 
-    // High-alert fallback
-    console.error("Failed to generate board via reverse simulation, falling back to random assignment");
-    const basicTiles = layout.positions.map((pos, i) => ({
+    // Create initial tiles
+    let tiles: TileInstance[] = layout.positions.map((pos, i) => ({
         id: generateTileId(),
-        typeId: tilePairs[i].id,
+        typeId: tilePairs[i % tilePairs.length].id,
         ...pos,
         isRemoved: false
     }));
-    return { tiles: basicTiles, layout };
+
+    // POST-PROCESS: Fix same-row matching pairs by swapping
+    // Group tiles by row (Y position)
+    const tilesByRow = new Map<number, TileInstance[]>();
+    for (const tile of tiles) {
+        const rowKey = Math.floor(tile.y * 10); // Handle fractional Y
+        if (!tilesByRow.has(rowKey)) tilesByRow.set(rowKey, []);
+        tilesByRow.get(rowKey)!.push(tile);
+    }
+
+    // Find and fix same-row matching pairs
+    const rowKeys = Array.from(tilesByRow.keys()).sort((a, b) => a - b);
+    for (let i = 0; i < rowKeys.length; i++) {
+        const row = tilesByRow.get(rowKeys[i])!;
+
+        // Find matching pairs in this row
+        const typeCount = new Map<string, TileInstance[]>();
+        for (const tile of row) {
+            const typeId = tile.typeId;
+            if (!typeCount.has(typeId)) typeCount.set(typeId, []);
+            typeCount.get(typeId)!.push(tile);
+        }
+
+        // For each type that appears 2+ times in this row, swap one with a tile from a different row
+        for (const [_typeId, tilesOfType] of typeCount) {
+            while (tilesOfType.length >= 2) {
+                const tileToSwap = tilesOfType.pop()!;
+                let swapped = false;
+
+                // Find a tile in a different row to swap with
+                for (let j = 0; j < rowKeys.length && !swapped; j++) {
+                    if (j === i) continue; // Skip same row
+
+                    const otherRow = tilesByRow.get(rowKeys[j])!;
+                    // Find a tile in otherRow that won't create a new same-row pair when swapped
+                    for (const otherTile of otherRow) {
+                        if (otherTile.typeId !== tileToSwap.typeId) {
+                            // Check if swapping would create a new same-row pair in the current row
+                            const wouldCreatePairInCurrentRow = row.some(t =>
+                                t !== tileToSwap && t.typeId === otherTile.typeId
+                            );
+
+                            // Also check if it would create a pair in the other row
+                            const wouldCreatePairInOtherRow = otherRow.some(t =>
+                                t !== otherTile && t.typeId === tileToSwap.typeId
+                            );
+
+                            if (!wouldCreatePairInCurrentRow && !wouldCreatePairInOtherRow) {
+                                // Swap typeIds
+                                const tempTypeId = tileToSwap.typeId;
+                                tileToSwap.typeId = otherTile.typeId;
+                                otherTile.typeId = tempTypeId;
+                                swapped = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    return { tiles, layout };
 }
+
+
+
 
 /**
  * Shuffle remaining tiles on the board - uses solvable algorithm with min distance
@@ -376,7 +437,8 @@ export function undoMove(
  * Create initial game state
  */
 export function createGameState(layout: Layout): GameState {
-    const board = generateBoard(layout);
+    const board = generateBoard(layout.id);
+
     return {
         board,
         selectedTileId: null,

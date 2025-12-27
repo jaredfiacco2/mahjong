@@ -54,9 +54,9 @@ export const Board: React.FC<BoardProps> = ({
             return { width: 0, height: 0, offsetX: 0, offsetY: 0, baseWidth: 0, baseHeight: 0 };
         }
 
-        // Match these constants precisely with index.css media queries
-        const tileW = isMobile ? 32 : (isTablet ? 38 : 46);
-        const tileH = isMobile ? 44 : (isTablet ? 52 : 62);
+        // Match Tile.tsx positioning - slightly larger than tile size for gaps
+        const tileW = isMobile ? 34 : (isTablet ? 42 : 50);
+        const tileH = isMobile ? 48 : (isTablet ? 58 : 68);
 
         const minX = Math.min(...activeTiles.map(t => t.x));
         const maxX = Math.max(...activeTiles.map(t => t.x));
@@ -76,7 +76,7 @@ export const Board: React.FC<BoardProps> = ({
         };
     }, [tiles, isMobile, isTablet]);
 
-    // Auto-scale the board to fit the viewport
+    // Auto-scale the board to fit the viewport dynamically
     const updateScale = useCallback(() => {
         if (!containerRef.current || baseWidth === 0 || baseHeight === 0) return;
 
@@ -86,7 +86,8 @@ export const Board: React.FC<BoardProps> = ({
 
         const scaleX = containerWidth / baseWidth;
         const scaleY = containerHeight / baseHeight;
-        const autoScale = Math.min(scaleX, scaleY, 1.2); // Max auto scale 1.2x
+        // Allow larger scale to fill available space (up to 2x)
+        const autoScale = Math.min(scaleX, scaleY, 2.0);
 
         // Apply user zoom on top of auto scale
         const finalScale = Math.max(0.4, autoScale) * userZoom;
@@ -161,18 +162,19 @@ export const Board: React.FC<BoardProps> = ({
         return new Set(hintPair);
     }, [hintPair]);
 
-    // Calculate hint line coordinates
+    // Calculate hint line coordinates (use desktop values as base, scaled by board)
     const hintLine = useMemo(() => {
         if (!hintPair) return null;
         const tile1 = tiles.find(t => t.id === hintPair[0]);
         const tile2 = tiles.find(t => t.id === hintPair[1]);
         if (!tile1 || !tile2) return null;
 
+        // Use desktop spacing (50x68 with tile centering)
         return {
-            x1: tile1.x * 46 + 23 + offsetX,
-            y1: tile1.y * 62 + 31 + offsetY,
-            x2: tile2.x * 46 + 23 + offsetX,
-            y2: tile2.y * 62 + 31 + offsetY,
+            x1: tile1.x * 50 + 25 + offsetX,
+            y1: tile1.y * 68 + 34 + offsetY,
+            x2: tile2.x * 50 + 25 + offsetX,
+            y2: tile2.y * 68 + 34 + offsetY,
         };
     }, [hintPair, tiles, offsetX, offsetY]);
 

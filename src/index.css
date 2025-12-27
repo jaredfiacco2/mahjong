@@ -100,21 +100,31 @@ body::after {
   transition: opacity 0.8s ease;
 }
 
-/* 3D Tile styling - Flawless */
-/* 3D Tile styling - High-End Boutique Chassis */
 .mahjong-tile {
   position: relative;
   cursor: pointer;
   user-select: none;
   width: 44px;
-  height: 60px;
+  height: 58px;
   perspective: 1200px;
   touch-action: manipulation;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: transform, box-shadow;
+  /* Only transition transform and box-shadow - NOT z-index (causes jitter) */
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, filter 0.2s ease-out;
+  will-change: transform;
 }
 
-/* Specular Boutique Shine Layer */
+/* Extend clickable/hoverable area to cover full grid cell (50x68) */
+.mahjong-tile::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -3px;
+  right: -3px;
+  bottom: -5px;
+  /* transparent but captures clicks */
+}
+
+/* Specular Boutique Shine Layer - MUST NOT block clicks */
 .mahjong-tile::before {
   content: "";
   position: absolute;
@@ -128,6 +138,7 @@ body::after {
       transparent 100%);
   z-index: 10;
   pointer-events: none;
+  /* Critical: allows clicks to pass through */
   animation: boutiqueShimmer 10s infinite linear;
   background-size: 300% 300%;
 }
@@ -188,15 +199,16 @@ body::after {
   pointer-events: none;
 }
 
-/* Enhanced hover effect - Sensory Lift */
+/* Enhanced hover effect - smooth lift without jitter */
 .mahjong-tile:hover:not(.tile-blocked) {
-  transform: translateY(-6px) rotateX(0.5deg);
-  z-index: 500 !important;
+  transform: translateY(-6px);
+  /* No scale - causes jitter */
+  z-index: 9999 !important;
 }
 
 .mahjong-tile:hover:not(.tile-blocked) .tile-face {
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 8px 20px rgba(0, 0, 0, 0.2),
     1px 1px 0 #edeef0,
     2.5px 2.5px 0 #e5e5ea,
     4.5px 5.5px 0 #d1d1d6,
@@ -290,14 +302,14 @@ body::after {
   }
 }
 
-/* Blocked/non-free tile */
+/* Blocked/non-free tile - dimmed but FULLY OPAQUE (no translucency) */
 .tile-blocked {
   cursor: not-allowed;
-  filter: brightness(0.7) saturate(0.5);
+  filter: brightness(0.55) saturate(0.4) contrast(0.9);
 }
 
 .tile-blocked .tile-face {
-  opacity: 0.75;
+  /* No opacity - tiles must be fully opaque to hide tiles underneath */
 }
 
 /* Match animation - tiles fly away with rotation */
@@ -438,12 +450,10 @@ body::after {
 .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--color-accent-gold) 0%, #ffeb3b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-imperial-gold);
+  /* Solid gold - crisp and readable */
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 2px 10px rgba(255, 193, 7, 0.3);
+  /* NO text-shadow or gradient - causes blur */
 }
 
 .stat-label {
@@ -455,51 +465,22 @@ body::after {
   opacity: 0.8;
 }
 
-/* Glass HUD Panel - Sophisticated */
-.glass-hud {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 0.75rem 1.75rem;
-  background: rgba(28, 28, 30, 0.55);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border-radius: 20px;
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-/* Luxury HUD Panel - Material & Inset */
+/* HUD Panel - Solid background for crisp, readable stats */
 .glass-hud {
   display: flex;
   align-items: center;
   gap: 2rem;
   padding: 0.85rem 2.5rem;
   background: #1c1c1e;
+  /* Solid dark background - NO blur */
   border-radius: 24px;
   border: 1px solid rgba(197, 160, 89, 0.2);
-  /* Subtle Gold border */
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.5),
     inset 0 1px 1px rgba(255, 255, 255, 0.05);
-}
-
-.stat-value {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  color: var(--color-imperial-gold);
-}
-
-.stat-label {
-  font-size: 9px;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.1em;
-  margin-top: 1px;
+  /* High z-index to ensure stats stay above tiles (which have z-index up to ~500) */
+  z-index: 1000;
+  position: relative;
 }
 
 .divider-v {
@@ -738,10 +719,12 @@ body::after {
 .board-container {
   flex: 1 1 0%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  /* Start below padding, don't center vertically */
   justify-content: center;
   overflow: auto;
-  padding: 1rem;
+  padding: 100px 1rem 100px 1rem;
+  /* Top/bottom padding for stats header & control bar */
   touch-action: pinch-zoom pan-x pan-y;
   width: 100%;
   max-width: 100vw;
@@ -749,8 +732,8 @@ body::after {
 
 @media (min-width: 1024px) {
   .board-container {
-    padding-top: 120px;
-    /* Safe zone for fixed HUD stats on desktop */
+    padding-top: 100px;
+    /* Slightly more on desktop for larger stats panel */
   }
 }
 

@@ -15,8 +15,8 @@ import './index.css';
 function App() {
   const { isMobile, isLandscape } = useMobile();
   const [initialLayoutSet, setInitialLayoutSet] = useState(false);
-  const [theme, setTheme] = useState<'ivory' | 'jade'>(() => {
-    return (localStorage.getItem('mahjong-theme') as 'ivory' | 'jade') || 'ivory';
+  const [theme, setTheme] = useState<'ivory' | 'midnight-jade'>(() => {
+    return (localStorage.getItem('mahjong-theme') as 'ivory' | 'midnight-jade') || 'ivory';
   });
 
   // Apply theme to body
@@ -25,7 +25,7 @@ function App() {
     localStorage.setItem('mahjong-theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme(prev => prev === 'ivory' ? 'jade' : 'ivory');
+  const toggleTheme = () => setTheme(prev => prev === 'ivory' ? 'midnight-jade' : 'ivory');
 
   const {
     gameState,
